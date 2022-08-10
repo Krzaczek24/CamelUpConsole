@@ -1,0 +1,3 @@
+[submodule "CamelUpEngine"]
+	path = CamelUpEngine
+	url = https://github.com/Krzaczek24/CamelUpEngine.git

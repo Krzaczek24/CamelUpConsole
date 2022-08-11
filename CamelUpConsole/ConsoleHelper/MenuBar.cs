@@ -7,8 +7,14 @@ namespace CamelUpConsole.ConsoleHelper
     {
         private const string SELECT_OPTION = "Select option: ";
 
+        /// <summary>
+        /// Distance in char count between options
+        /// </summary>
         public static int OptionsSpacing { get; set; } = 1;
-        public static int OptionsMaxLength { get; set; } = 12;
+        /// <summary>
+        /// If non positive then option fields are fitted to option descriptions, otherwise options lenght are constant
+        /// </summary>
+        public static int OptionsMaxLength { get; set; } = 0;
 
         public static void Render(Options options, int optionsToRight = 0)
         {

@@ -10,6 +10,24 @@ namespace CamelUpConsole.ConsoleHelper.MenuBarModels
         private List<Option> entries;
         public int Count => entries.Count;
 
+        public IReadOnlyCollection<ConsoleKey> AvailableKeys
+        {
+            get
+            {
+                List<ConsoleKey> keys = new();
+                char c;
+                foreach (Option option in entries)
+                {
+                    c = char.ToUpper(option.Key);
+                    if (Enum.TryParse($"{c}", out ConsoleKey key)
+                    || Enum.TryParse($"D{c}", out key)
+                    || Enum.TryParse($"F{c}", out key))
+                        keys.Add(key);
+                }
+                return keys;
+            }
+        }
+
         public Options(params Option[] options)
         {
             CreateOptions(options);

@@ -1,6 +1,8 @@
 ﻿using CamelUpConsole.ConsoleHelper;
-using CamelUpConsole.ConsoleHelper.MenuBarModels;
+using CamelUpConsole.Enums;
+using CamelUpConsole.Mappings;
 using System;
+using System.Linq;
 
 namespace CamelUpConsole
 {
@@ -8,22 +10,21 @@ namespace CamelUpConsole
     {
         static void Main(string[] args)
         {
-            Console.Title = "Camel Up!";
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.Title = "Camel Up";
+            Intro.Render();
 
-            //MenuBar.OptionsMaxLength = 20;
-            MenuBar.OptionsMaxLength = 0;
-
-            //TestAscii();
-            //TestColor();
-
+            ConsoleKey key = ConsoleKey.Q;
+            var options = MenuMapping.LevelOptions[MenuLevels.ActionChoose];
+            MenuBar.Render(options, 1);
             do
             {
-                Options options = new("D Draw dice ", "C Draw typing card ", "A Put audience tile ", "B Make bet ", "Q Quit game ");
-                MenuBar.Render(options, 1);
+                if (!options.AvailableKeys.Contains(key))
+                {
+                    MenuBar.PrintMessage($"There is no action available for [{key.ToString().ToUpper()}] key");
+                    MenuBar.SetCursorInOptionSelect();
+                }
             }
-            while (Console.ReadKey().Key != ConsoleKey.Q);
+            while ((key = Console.ReadKey().Key) != ConsoleKey.Q);
 
             //Console.ReadKey();
         }

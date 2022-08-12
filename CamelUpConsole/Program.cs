@@ -2,31 +2,92 @@
 using CamelUpConsole.Enums;
 using CamelUpConsole.Mappings;
 using System;
-using System.Linq;
 
 namespace CamelUpConsole
 {
     internal class Program
     {
+        private static ConsoleKey key;
+
         static void Main(string[] args)
         {
+            Console.Clear();
             Console.Title = "Camel Up";
             Intro.Render();
 
-            ConsoleKey key = ConsoleKey.Q;
-            var options = MenuMapping.LevelOptions[MenuLevels.ActionChoose];
-            MenuBar.Render(options, 1);
-            do
+            MainMenu();
+        }
+
+        private static void MainMenu()
+        {
+            while (true)
             {
-                if (!options.AvailableKeys.Contains(key))
+                MenuBar.Render(MenuMapping.LevelOptions[MenuLevels.MainMenu], 1);
+                MenuBar.PrintMessage("Hello my friend, welcome in Camel Up game, where sand is hot and camels are ready for ride. Let's go make some bets!");
+
+                switch (key = Console.ReadKey().Key)
                 {
-                    MenuBar.PrintMessage($"There is no action available for [{key.ToString().ToUpper()}] key");
-                    MenuBar.SetCursorInOptionSelect();
+                    case ConsoleKey.N:
+                        NewGame();
+                        break;
+                    case ConsoleKey.Q:
+                        if (Confirm("Are you sure that you want to exit game?"))
+                            Environment.Exit(0);
+                        break;
+                    default:
+                        MenuBar.PrintNoSupportedKeyError(key);                        
+                        break;
                 }
             }
-            while ((key = Console.ReadKey().Key) != ConsoleKey.Q);
+        }
 
-            //Console.ReadKey();
+        private static void NewGame()
+        {
+            while (true)
+            {
+                MenuBar.Render(MenuMapping.LevelOptions[MenuLevels.GameMode], 2);
+                MenuBar.PrintMessage("Please my friend, which game mode you are willing to play?");
+
+                switch (key = Console.ReadKey().Key)
+                {
+                    case ConsoleKey.S:
+                        
+                        break;
+                    case ConsoleKey.M:
+
+                        break;
+                    case ConsoleKey.B:
+                        return;
+                    case ConsoleKey.Q:
+                        if (Confirm("Are you sure that you want to exit game?"))
+                            Environment.Exit(0);
+                        break;
+                    default:
+                        MenuBar.PrintNoSupportedKeyError(key);
+                        break;
+                }
+            }
+        }
+
+        private static bool Confirm(string message, ConsoleColor color = ConsoleColor.DarkYellow)
+        {
+            var options = MenuMapping.LevelOptions[MenuLevels.Confirmation];
+            MenuBar.Render(options);
+            MenuBar.PrintMessage(message, color);
+
+            while (true)
+            {
+                switch (key = Console.ReadKey().Key)
+                {
+                    case ConsoleKey.Y:
+                        return true;
+                    case ConsoleKey.N:
+                        return false;
+                    default:
+                        MenuBar.PrintNoSupportedKeyError(key);
+                        break;
+                }
+            }
         }
 
         private static void TestAscii()

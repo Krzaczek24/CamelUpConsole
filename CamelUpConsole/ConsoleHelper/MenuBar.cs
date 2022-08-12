@@ -34,15 +34,19 @@ namespace CamelUpConsole.ConsoleHelper
             Console.Write(string.Empty.PadRight(Console.WindowWidth));
 
             RenderOptions(options, optionsToRight);
+            Console.SetCursorPosition(0, 0);
             SetCursorInOptionSelect();
         }
 
-        public static void PrintMessage(string message)
+        public static void PrintNoSupportedKeyError(ConsoleKey key) => PrintError($"There is no action available for [{key}] key");
+        public static void PrintError(string message) => PrintMessage(message, ConsoleColor.DarkRed);
+        public static void PrintMessage(string message, ConsoleColor color = ConsoleColor.Green)
         {
             Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.ForegroundColor = color;
             Console.SetCursorPosition(0, Console.WindowHeight - 3);
             Console.Write(message.PadRight(Console.WindowWidth));
+            SetCursorInOptionSelect();
         }
 
         public static void SetCursorInOptionSelect()
@@ -61,7 +65,6 @@ namespace CamelUpConsole.ConsoleHelper
                 column += RenderSingleOption(options[index], column) + OptionsSpacing;
             }
 
-            //column = Console.WindowWidth - optionsToRight * (OptionsMaxLength + OptionsSpacing) + 1;
             column = Console.WindowWidth;
 
             for (int index = options.Count - 1; index >= indexOfRightAligment; index--)

@@ -2,8 +2,9 @@
 {
     internal enum MenuLevels
     {
-        StartGame,
-        InputPlayerNames,
-        ActionChoose
+        ActionChoose,
+        Confirmation,
+        GameMode,
+        MainMenu
     }
 }

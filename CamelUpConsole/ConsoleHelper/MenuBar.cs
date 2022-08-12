@@ -1,4 +1,6 @@
 ﻿using CamelUpConsole.ConsoleHelper.MenuBarModels;
+using CamelUpConsole.Enums;
+using CamelUpConsole.Mappings;
 using System;
 
 namespace CamelUpConsole.ConsoleHelper
@@ -15,6 +17,11 @@ namespace CamelUpConsole.ConsoleHelper
         /// If non positive then option fields are fitted to option descriptions, otherwise options lenght are constant
         /// </summary>
         public static int OptionsMaxLength { get; set; } = 0;
+
+        public static void Render(MenuLevels menuLevel)
+        {
+            Render(MenuMapping.LevelOptions[menuLevel], MenuMapping.LevelOptionsAlignToRight[menuLevel]);
+        }
 
         public static void Render(Options options, int optionsToRight = 0)
         {

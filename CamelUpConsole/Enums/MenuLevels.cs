@@ -3,8 +3,10 @@
     internal enum MenuLevels
     {
         ActionChoose,
+        ComputerPlayersCount,
         Confirmation,
         GameMode,
+        HumanPlayersCount,
         MainMenu
     }
 }

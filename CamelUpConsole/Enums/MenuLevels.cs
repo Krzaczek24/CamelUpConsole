@@ -2,11 +2,13 @@
 {
     internal enum MenuLevels
     {
-        ActionChoose,
+        BackOrQuit,
         ComputerPlayersCount,
         Confirmation,
+        GameActionChoose,
         GameMode,
         HumanPlayersCount,
-        MainMenu
+        MainMenu,
+        Scrollable
     }
 }

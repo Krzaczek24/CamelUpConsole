@@ -1,6 +1,8 @@
-﻿using CamelUpConsole.ConsoleHelper;
-using CamelUpConsole.Constants;
+﻿using CamelUpConsole.Constants;
+using CamelUpConsole.Core.MenuBar;
+using CamelUpConsole.Core.Pages.ReadyPages;
 using CamelUpConsole.Enums;
+using CamelUpConsole.Mappings;
 using CamelUpEngine.Extensions;
 using System;
 
@@ -9,42 +11,59 @@ namespace CamelUpConsole
     internal class Program
     {
         private static ConsoleKeyInfo keyInfo;
-        private static bool render;
+        private static bool renderPage;
+        private static bool renderMenu;
 
         static void Main(string[] args)
         {
+            if (OperatingSystem.IsWindows())
+            {
+                Console.SetBufferSize(120, 30);
+                Console.SetWindowSize(120, 30);
+            }
+            
             Console.Clear();
             Console.Title = "Camel Up";
-            Intro.Render();
 
             MainMenu();
         }
 
         private static void MainMenu()
         {
-            render = true;
+            Intro intro = new();
+            renderPage = renderMenu = true;
             while (true)
             {
-                if (render)
+                if (renderPage)
+                {
+                    intro.Render();
+                }
+
+                if (renderMenu)
                 {
                     MenuBar.Render(MenuLevels.MainMenu);
                     MenuBar.PrintMessage("Hello my friend, welcome in Camel Up game, where sand is hot and camels are ready for ride. Let's go make some bets!");
-                    render = false;
                 }
 
-                render = true;
-                switch ((keyInfo = Console.ReadKey()).Key)
+                renderPage = false;
+                renderMenu = true;
+                switch ((keyInfo = Console.ReadKey(true)).Key)
                 {
                     case ConsoleKey.N:
                         NewGame();
                         break;
-                    case ConsoleKey.Q:
+                    case ConsoleKey.A:
+                        About();
+                        renderPage = true;
+                        break;
+                    case MenuMapping.BackKey:
+                    case MenuMapping.QuitKey:
                         if (Confirm("Are you sure that you want to exit game?"))
                             Environment.Exit(0);
                         break;
                     default:
-                        MenuBar.PrintNoSupportedKeyError(keyInfo.Key);
-                        render = false;
+                        MenuBar.PrintNoSupportedKeyError(keyInfo);
+                        renderMenu = false;
                         break;
                 }
             }
@@ -52,18 +71,17 @@ namespace CamelUpConsole
 
         private static void NewGame()
         {
-            render = true;
+            renderMenu = true;
             while (true)
             {
-                if (render)
+                if (renderMenu)
                 {
                     MenuBar.Render(MenuLevels.GameMode);
                     MenuBar.PrintMessage("Which game mode you are willing to play my friend?");
-                    render = false;
                 }
 
-                render = true;
-                switch ((keyInfo = Console.ReadKey()).Key)
+                renderMenu = true;
+                switch ((keyInfo = Console.ReadKey(true)).Key)
                 {
                     case ConsoleKey.S:
                         SinglePlayer();
@@ -71,15 +89,15 @@ namespace CamelUpConsole
                     case ConsoleKey.M:
                         MultiPlayer();
                         break;
-                    case ConsoleKey.B:
+                    case MenuMapping.BackKey:
                         return;
-                    case ConsoleKey.Q:
+                    case MenuMapping.QuitKey:
                         if (Confirm("Are you sure my friend that you want to exit game?"))
                             Environment.Exit(0);
                         break;
                     default:
-                        MenuBar.PrintNoSupportedKeyError(keyInfo.Key);
-                        render = false;
+                        MenuBar.PrintNoSupportedKeyError(keyInfo);
+                        renderMenu = false;
                         break;
                 }
             }
@@ -87,18 +105,17 @@ namespace CamelUpConsole
 
         private static void SinglePlayer()
         {
-            render = true;
+            renderMenu = true;
             while (true)
             {
-                if (render)
+                if (renderMenu)
                 {
                     MenuBar.Render(MenuLevels.ComputerPlayersCount);
                     MenuBar.PrintMessage("How many computer players you want to encounter, my friend?");
-                    render = false;
                 }
 
-                render = true;
-                switch ((keyInfo = Console.ReadKey()).Key)
+                renderMenu = true;
+                switch ((keyInfo = Console.ReadKey(true)).Key)
                 {
                     case ConsoleKey.D2:
                     case ConsoleKey.D3:
@@ -109,17 +126,17 @@ namespace CamelUpConsole
                         int number = int.Parse(keyInfo.KeyChar.ToString());
                         var names = Collections.Names.GetRandom(number);
                         MenuBar.PrintMessage(string.Join(", ", names));
-                        render = false;
+                        renderMenu = false;
                         break;
-                    case ConsoleKey.B:
+                    case MenuMapping.BackKey:
                         return;
-                    case ConsoleKey.Q:
+                    case MenuMapping.QuitKey:
                         if (Confirm("Are you sure that you want to exit game?"))
                             Environment.Exit(0);
                         break;
                     default:
-                        MenuBar.PrintNoSupportedKeyError(keyInfo.Key);
-                        render = false;
+                        MenuBar.PrintNoSupportedKeyError(keyInfo);
+                        renderMenu = false;
                         break;
                 }
             }
@@ -127,29 +144,28 @@ namespace CamelUpConsole
 
         private static void MultiPlayer()
         {
-            render = true;
+            renderMenu = true;
             while (true)
             {
-                if (render)
+                if (renderMenu)
                 {
                     MenuBar.Render(MenuLevels.HumanPlayersCount);
                     MenuBar.PrintMessage("How big is your team, my friend?");
-                    render = false;
                 }
 
-                render = true;
-                switch ((keyInfo = Console.ReadKey()).Key)
+                renderMenu = true;
+                switch ((keyInfo = Console.ReadKey(true)).Key)
                 {
                     // TODO: implement multiplayer
-                    case ConsoleKey.B:
+                    case MenuMapping.BackKey:
                         return;
-                    case ConsoleKey.Q:
+                    case MenuMapping.QuitKey:
                         if (Confirm("Are you sure that you want to exit game?"))
                             Environment.Exit(0);
                         break;
                     default:
-                        MenuBar.PrintNoSupportedKeyError(keyInfo.Key);
-                        render = false;
+                        MenuBar.PrintNoSupportedKeyError(keyInfo);
+                        renderMenu = false;
                         break;
                 }
             }
@@ -157,26 +173,75 @@ namespace CamelUpConsole
 
         private static bool Confirm(string message, ConsoleColor color = ConsoleColor.DarkYellow)
         {
-            render = true;
+            renderMenu = true;
             while (true)
             {
-                if (render)
+                if (renderMenu)
                 {
                     MenuBar.Render(MenuLevels.Confirmation);
-                    MenuBar.PrintMessage(message, color);
-                    render = false;
+                    MenuBar.PrintMessage(message, color);                    
                 }
 
-                render = true;
-                switch ((keyInfo = Console.ReadKey()).Key)
+                renderMenu = true;
+                switch ((keyInfo = Console.ReadKey(true)).Key)
                 {
+                    case MenuMapping.ConfirmKey:
                     case ConsoleKey.Y:
                         return true;
+                    case MenuMapping.BackKey:
                     case ConsoleKey.N:
                         return false;
                     default:
-                        MenuBar.PrintNoSupportedKeyError(keyInfo.Key);
-                        render = false;
+                        MenuBar.PrintNoSupportedKeyError(keyInfo);
+                        renderMenu = false;
+                        break;
+                }
+            }
+        }
+
+        private static void About()
+        {
+            AboutGame aboutGame = new AboutGame();
+            renderPage = renderMenu = true;
+            while (true)
+            {
+                if (renderPage)
+                {
+                    aboutGame.Render();
+                }
+
+                if (renderMenu)
+                {
+                    MenuBar.Render(aboutGame);
+                    MenuBar.PrintMessage("My dear friend, I am so pleased for that you came here to check this information.");
+                }
+
+                renderPage = true;
+                renderMenu = true;
+                switch ((keyInfo = Console.ReadKey(true)).Key)
+                {
+                    case ConsoleKey.UpArrow:
+                        aboutGame.ScrollUp();
+                        break;
+                    case ConsoleKey.DownArrow:
+                        aboutGame.ScrollDown();
+                        break;
+                    case ConsoleKey.PageUp:
+                        aboutGame.PageUp();
+                        break;
+                    case ConsoleKey.PageDown:
+                        aboutGame.PageDown();
+                        break;
+                    case MenuMapping.BackKey:
+                        return;
+                    case MenuMapping.QuitKey:
+                        if (Confirm("Are you sure that you want to exit game?"))
+                            Environment.Exit(0);
+                        renderPage = false;
+                        break;
+                    default:
+                        MenuBar.PrintNoSupportedKeyError(keyInfo);
+                        renderPage = renderMenu = false;
                         break;
                 }
             }

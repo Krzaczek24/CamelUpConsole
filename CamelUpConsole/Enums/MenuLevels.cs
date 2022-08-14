@@ -2,6 +2,7 @@
 {
     internal enum MenuLevels
     {
+        AddedSomePlayer,
         BackOrQuit,
         ComputerPlayersCount,
         Confirmation,

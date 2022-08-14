@@ -1,10 +1,12 @@
-﻿using CamelUpConsole.Constants;
+﻿using CamelUpConsole.Core.Actions;
 using CamelUpConsole.Core.MenuBar;
 using CamelUpConsole.Core.Pages.ReadyPages;
 using CamelUpConsole.Enums;
 using CamelUpConsole.Mappings;
-using CamelUpEngine.Extensions;
+using CamelUpEngine;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CamelUpConsole
 {
@@ -16,6 +18,12 @@ namespace CamelUpConsole
 
         static void Main(string[] args)
         {
+            //TestAscii();
+            //Console.ReadLine();
+            //return;
+
+            MenuBar.Settings.Margin = 1;
+
             if (OperatingSystem.IsWindows())
             {
                 Console.SetBufferSize(120, 30);
@@ -85,10 +93,10 @@ namespace CamelUpConsole
                 {
                     case ConsoleKey.S:
                         SinglePlayer();
-                        break;
+                        return;
                     case ConsoleKey.M:
                         MultiPlayer();
-                        break;
+                        return;
                     case MenuMapping.BackKey:
                         return;
                     case MenuMapping.QuitKey:
@@ -123,10 +131,8 @@ namespace CamelUpConsole
                     case ConsoleKey.D5:
                     case ConsoleKey.D6:
                     case ConsoleKey.D7:
-                        int number = int.Parse(keyInfo.KeyChar.ToString());
-                        var names = Collections.Names.GetRandom(number);
-                        MenuBar.PrintMessage(string.Join(", ", names));
-                        renderMenu = false;
+                        // TODO: implement singleplayer
+                        //CreatingGame(int.Parse(keyInfo.KeyChar.ToString()));
                         break;
                     case MenuMapping.BackKey:
                         return;
@@ -156,7 +162,15 @@ namespace CamelUpConsole
                 renderMenu = true;
                 switch ((keyInfo = Console.ReadKey(true)).Key)
                 {
-                    // TODO: implement multiplayer
+                    case ConsoleKey.D3:
+                    case ConsoleKey.D4:
+                    case ConsoleKey.D5:
+                    case ConsoleKey.D6:
+                    case ConsoleKey.D7:
+                    case ConsoleKey.D8:
+                        var game = CreatingGame(int.Parse(keyInfo.KeyChar.ToString()));
+                        // TODO: continue here
+                        return;
                     case MenuMapping.BackKey:
                         return;
                     case MenuMapping.QuitKey:
@@ -171,8 +185,91 @@ namespace CamelUpConsole
             }
         }
 
+        private static Game CreatingGame(int playersCount)
+        {
+            const int nameMaxLength = 12;
+            List<string> players = new();
+            for (int index = 0; index < playersCount; index++)
+            {
+                bool commitedPlayerName = false;
+                string playerName = string.Empty;
+                renderMenu = true;
+                while (!commitedPlayerName)
+                {
+                    if (renderMenu)
+                    {
+                        MenuBar.Settings.SelectionText = $"Enter {index + 1}. player name: {playerName}";
+                        if (players.Any())
+                        {
+                            MenuBar.Render(MenuLevels.AddedSomePlayer);
+                            MenuBar.PrintMessage($"Already passed player names: {string.Join(", ", players)}.");
+                        }
+                        else
+                        {
+                            MenuBar.Render(MenuLevels.BackOrQuit);
+                            MenuBar.PrintMessage("I am so glad, you are willing to get part in our competition.");
+                        }
+                    }
+
+                    renderMenu = true;
+                    switch ((keyInfo = Console.ReadKey(true)).Key)
+                    {
+                        case ConsoleKey.Enter:
+                            if (Game.IsPlayerNameValid(playerName))
+                            {
+                                players.Add(playerName);
+                                commitedPlayerName = true;
+                            }
+                            else
+                            {
+                                playerName = string.Empty;
+                            }
+                            break;
+                        case ConsoleKey.Backspace:
+                            if (playerName.Length > 0)
+                                playerName = new string(playerName.SkipLast(1).ToArray());
+                            break;
+                        case ConsoleKey.Delete:
+                            if (players.Any() && Confirm($"Are you sure that you want to remove player {players.Last()}?"))
+                                players.RemoveAt(--index);
+                            break;
+                        case MenuMapping.BackKey:
+                            MenuBar.Settings.ResetSelectionText();
+                            if (!players.Any() || Confirm("Are you sure that you want to go back? You will lost all already inserted names."))
+                                return null;
+                            break;
+                        case MenuMapping.QuitKey:
+                            if (Confirm("Are you sure that you want to exit game?"))
+                                Environment.Exit(0);
+                            break;
+                        default:
+                            if (!char.IsLetter(keyInfo.KeyChar))
+                            {
+                                MenuBar.PrintError("I am sorry, for player names please use only letters, without digits, spaces or special characters.");
+                                renderMenu = false;
+                                break;
+                            }
+                            if (playerName.Length > nameMaxLength)
+                            {
+                                MenuBar.PrintError($"I am so sorry, but player name cannot be longer than {nameMaxLength} characters.");
+                                renderMenu = false;
+                                break;
+                            }
+                            playerName += keyInfo.KeyChar;
+                            break;
+                    }
+                }
+            }
+
+            MenuBar.Settings.ResetSelectionText();
+            return new Game(players);
+        }
+
         private static bool Confirm(string message, ConsoleColor color = ConsoleColor.DarkYellow)
         {
+            string oldSelectionText = MenuBar.Settings.SelectionText;
+            MenuBar.Settings.ResetSelectionText();
+
             renderMenu = true;
             while (true)
             {
@@ -187,9 +284,11 @@ namespace CamelUpConsole
                 {
                     case MenuMapping.ConfirmKey:
                     case ConsoleKey.Y:
+                        MenuBar.Settings.SelectionText = oldSelectionText;
                         return true;
                     case MenuMapping.BackKey:
                     case ConsoleKey.N:
+                        MenuBar.Settings.SelectionText = oldSelectionText;
                         return false;
                     default:
                         MenuBar.PrintNoSupportedKeyError(keyInfo);
@@ -249,36 +348,15 @@ namespace CamelUpConsole
 
         private static void TestAscii()
         {
-            for (int c = 0; c < 256; c++)
+            for (int c = 0; c < 1024; c++)
             {
-                Console.Write($"{c} = ");
-                Console.WriteLine((char)c);
-            }
-        }
-
-        private static void TestColor()
-        {
-            string str = "Test";
-            var colors = Enum.GetValues<ConsoleColor>();
-            int row = 0, col = 0;
-            foreach (var colorA in colors)
-            {
-                foreach (var colorB in colors)
+                try
                 {
-                    Console.BackgroundColor = colorA;
-                    Console.ForegroundColor = colorB;
-                    Console.SetCursorPosition(col * (str.Length + 1), row);
-                    Console.Write(str);
-
-                    col++;
+                    Console.Write($"{c} = ");
+                    Console.WriteLine((char)c);
                 }
-                col = 0;
-                row++;
+                catch { }
             }
-
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine();
         }
     }
 }

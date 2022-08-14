@@ -2,6 +2,7 @@
 {
     internal enum TextAligment
     {
+        None,
         Left,
         Right,
         Center

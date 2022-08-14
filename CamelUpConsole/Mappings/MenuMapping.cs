@@ -18,7 +18,8 @@ namespace CamelUpConsole.Mappings
         {
             [MenuLevels.BackOrQuit] = new Options(GoBack, ExitGame),
             [MenuLevels.ComputerPlayersCount] = new("2 Two ", "3 Three ", "4 Four ", "5 Five ", "6 Six ", "7 Seven ", GoBack, ExitGame),
-            [MenuLevels.Confirmation] = new(new Option("Enter/Y", " Yes "), new Option("Esc/N", " No ")),
+            [MenuLevels.Confirmation] = new(new Option("Y|Enter", " Yes "), new Option("N|Esc", " No ")),
+            [MenuLevels.AddedSomePlayer] = new(new Option("Del", " Remove last player "), GoBack, ExitGame),
             [MenuLevels.GameActionChoose] = new("D Draw dice ", "C Draw typing card ", "A Put audience tile ", "B Make bet ", new Option(BackKey.ToString().Substring(0, 3), " End game "), ExitGame),
             [MenuLevels.GameMode] = new("S Singleplayer ", "M Multiplayer ", GoBack, ExitGame),
             [MenuLevels.HumanPlayersCount] = new("3 Three ", "4 Four ", "5 Five ", "6 Six ", "7 Seven ", "8 Eight ", GoBack, ExitGame),
@@ -28,7 +29,8 @@ namespace CamelUpConsole.Mappings
 
         public static IReadOnlyDictionary<MenuLevels, int> LevelOptionsAlignToRight { get; } = new Dictionary<MenuLevels, int>()
         {
-            [MenuLevels.BackOrQuit] = 2,
+            [MenuLevels.AddedSomePlayer] = -1,
+            [MenuLevels.BackOrQuit] = -1,
             [MenuLevels.ComputerPlayersCount] = 2,
             [MenuLevels.Confirmation] = 0,
             [MenuLevels.GameActionChoose] = 2,

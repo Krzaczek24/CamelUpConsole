@@ -9,16 +9,18 @@ namespace CamelUpConsole.Core
         public string Text { get; set; } = string.Empty;
         public TextAligment TextAligment { get; set; }
         public int Margin { get; set; }
+        public int MaxLength { get; set; }
         public ConsoleColor? Foreground { get; set; }
         public ConsoleColor? Background { get; set; }
 
         public static LineRenderInfo BlankLine { get; } = new LineRenderInfo(string.Empty);
 
-        public LineRenderInfo(string text, TextAligment aligment = TextAligment.Left, ConsoleColor? foreground = null, ConsoleColor? background = null, int margin = MARGIN_DEFAULT)
+        public LineRenderInfo(string text, TextAligment aligment = TextAligment.Left, ConsoleColor? foreground = null, ConsoleColor? background = null, int margin = MARGIN_DEFAULT, int maxLength = 0)
         {
             Text = text;
             TextAligment = aligment;
             Margin = margin;
+            MaxLength = maxLength > 0 ? maxLength : Console.WindowWidth;
             Foreground = foreground;
             Background = background;
         }
@@ -30,11 +32,11 @@ namespace CamelUpConsole.Core
                 case TextAligment.None:
                     return Text;
                 case TextAligment.Left:
-                    return ToLeftFullLine(Text, Margin);
+                    return ToLeftFullLine(Text, Margin, MaxLength);
                 case TextAligment.Right:
-                    return ToRightFullLine(Text, Margin);
+                    return ToRightFullLine(Text, Margin, MaxLength);
                 case TextAligment.Center:
-                    return CenteredFullLine(Text, Margin);
+                    return CenteredFullLine(Text, Margin, MaxLength);
                 default:
                     throw new NotImplementedException($"Unknown value [{TextAligment}] of {nameof(TextAligment)}");
             }
@@ -46,14 +48,14 @@ namespace CamelUpConsole.Core
             Console.BackgroundColor = Background ?? Console.BackgroundColor;
             string formattedText = GetFormattedText();
             if (Console.CursorTop + 1 == Console.WindowHeight 
-            && Console.CursorLeft + formattedText.Length >= Console.WindowWidth)
+            && Console.CursorLeft + formattedText.Length >= MaxLength)
                 formattedText = formattedText.Substring(0, formattedText.Length - 1);
             Console.Write(formattedText);
         }
 
-        public static string CenteredFullLine(string str, int margin = MARGIN_DEFAULT)
+        public static string CenteredFullLine(string str, int margin = MARGIN_DEFAULT, int maxWidth = 0)
         {
-            int maxWidth = Console.WindowWidth;
+            maxWidth = maxWidth > 0 ? maxWidth : Console.WindowWidth;
             int lengthWithMargins = str.Length + 2 * margin;
 
             if (lengthWithMargins < maxWidth)
@@ -63,18 +65,19 @@ namespace CamelUpConsole.Core
             if (lengthWithMargins > maxWidth)
                 str = str.Substring(margin, maxWidth - 2 * margin);
 
-            return str.PadLeft(margin + str.Length)
-                .PadRight(maxWidth);
+            return str.PadLeft(margin + str.Length).PadRight(maxWidth);
         }
 
-        public static string ToLeftFullLine(string str, int margin = MARGIN_DEFAULT)
+        public static string ToLeftFullLine(string str, int margin = MARGIN_DEFAULT, int maxWidth = 0)
         {
-            return str.PadLeft(margin + str.Length).PadRight(Console.WindowWidth);
+            maxWidth = maxWidth > 0 ? maxWidth : Console.WindowWidth;
+            return str.PadLeft(margin + str.Length).PadRight(maxWidth);
         }
 
-        public static string ToRightFullLine(string str, int margin = MARGIN_DEFAULT)
+        public static string ToRightFullLine(string str, int margin = MARGIN_DEFAULT, int maxWidth = 0)
         {
-            return str.PadRight(margin + str.Length).PadLeft(Console.WindowWidth);
+            maxWidth = maxWidth > 0 ? maxWidth : Console.WindowWidth;
+            return str.PadRight(margin + str.Length).PadLeft(maxWidth);
         }
     }
 }

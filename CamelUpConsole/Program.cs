@@ -1,9 +1,10 @@
-﻿using CamelUpConsole.Core.Actions;
+﻿using CamelUpConsole.Constants;
 using CamelUpConsole.Core.MenuBar;
 using CamelUpConsole.Core.Pages.ReadyPages;
 using CamelUpConsole.Enums;
 using CamelUpConsole.Mappings;
 using CamelUpEngine;
+using CamelUpEngine.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,8 @@ namespace CamelUpConsole
         private static ConsoleKeyInfo keyInfo;
         private static bool renderPage;
         private static bool renderMenu;
+        private static Game game = null;
+        private static string singlePlayerName = null;
 
         static void Main(string[] args)
         {
@@ -22,12 +25,12 @@ namespace CamelUpConsole
             //Console.ReadLine();
             //return;
 
-            MenuBar.Settings.Margin = 1;
-
             if (OperatingSystem.IsWindows())
             {
-                Console.SetBufferSize(120, 30);
-                Console.SetWindowSize(120, 30);
+                const int width = 120;
+                const int height = 30;
+                Console.SetBufferSize(width, height);
+                Console.SetWindowSize(width, height);
             }
             
             Console.Clear();
@@ -38,6 +41,7 @@ namespace CamelUpConsole
 
         private static void MainMenu()
         {
+            MenuLevels menuLevel = MenuLevels.MainMenu;
             Intro intro = new();
             renderPage = renderMenu = true;
             while (true)
@@ -49,7 +53,7 @@ namespace CamelUpConsole
 
                 if (renderMenu)
                 {
-                    MenuBar.Render(MenuLevels.MainMenu);
+                    MenuBar.Render(menuLevel);
                     MenuBar.PrintMessage("Hello my friend, welcome in Camel Up game, where sand is hot and camels are ready for ride. Let's go make some bets!");
                 }
 
@@ -59,10 +63,21 @@ namespace CamelUpConsole
                 {
                     case ConsoleKey.N:
                         NewGame();
+                        menuLevel = game?.GameIsOver ?? true ? MenuLevels.MainMenu : MenuLevels.MainMenuWithGame;
                         break;
                     case ConsoleKey.A:
                         About();
                         renderPage = true;
+                        break;
+                    case ConsoleKey.C:
+                        if (menuLevel == MenuLevels.MainMenuWithGame)
+                        {
+                            Gameplay();
+                            menuLevel = game?.GameIsOver ?? true ? MenuLevels.MainMenu : MenuLevels.MainMenuWithGame;
+                            break;
+                        }
+                        MenuBar.PrintNoSupportedKeyError(keyInfo);
+                        renderMenu = false;
                         break;
                     case MenuMapping.BackKey:
                     case MenuMapping.QuitKey:
@@ -119,7 +134,7 @@ namespace CamelUpConsole
                 if (renderMenu)
                 {
                     MenuBar.Render(MenuLevels.ComputerPlayersCount);
-                    MenuBar.PrintMessage("How many computer players you want to encounter, my friend?");
+                    MenuBar.PrintMessage("How many computer players you want to encounter?");
                 }
 
                 renderMenu = true;
@@ -131,9 +146,10 @@ namespace CamelUpConsole
                     case ConsoleKey.D5:
                     case ConsoleKey.D6:
                     case ConsoleKey.D7:
-                        // TODO: implement singleplayer
-                        //CreatingGame(int.Parse(keyInfo.KeyChar.ToString()));
-                        break;
+                        singlePlayerName = string.Empty;
+                        CreateGame(int.Parse(keyInfo.KeyChar.ToString()));
+                        Gameplay();
+                        return;
                     case MenuMapping.BackKey:
                         return;
                     case MenuMapping.QuitKey:
@@ -168,8 +184,9 @@ namespace CamelUpConsole
                     case ConsoleKey.D6:
                     case ConsoleKey.D7:
                     case ConsoleKey.D8:
-                        var game = CreatingGame(int.Parse(keyInfo.KeyChar.ToString()));
-                        // TODO: continue here
+                        singlePlayerName = null;
+                        CreateGame(int.Parse(keyInfo.KeyChar.ToString()));
+                        Gameplay();
                         return;
                     case MenuMapping.BackKey:
                         return;
@@ -185,7 +202,7 @@ namespace CamelUpConsole
             }
         }
 
-        private static Game CreatingGame(int playersCount)
+        private static void CreateGame(int playersCount)
         {
             const int nameMaxLength = 12;
             List<string> players = new();
@@ -198,7 +215,15 @@ namespace CamelUpConsole
                 {
                     if (renderMenu)
                     {
-                        MenuBar.Settings.SelectionText = $"Enter {index + 1}. player name: {playerName}";
+                        if (singlePlayerName == string.Empty)
+                        {
+                            MenuBar.Settings.SelectionText = $"Enter your name: {playerName}";
+                        }
+                        else
+                        {
+                            MenuBar.Settings.SelectionText = $"Enter {index + 1}. player name: {playerName}";
+                        }
+                        
                         if (players.Any())
                         {
                             MenuBar.Render(MenuLevels.AddedSomePlayer);
@@ -222,7 +247,8 @@ namespace CamelUpConsole
                             }
                             else
                             {
-                                playerName = string.Empty;
+                                MenuBar.PrintError("I am sorry, but passed player name is not valid. Please, try again.");
+                                renderMenu = false;
                             }
                             break;
                         case ConsoleKey.Backspace:
@@ -236,7 +262,7 @@ namespace CamelUpConsole
                         case MenuMapping.BackKey:
                             MenuBar.Settings.ResetSelectionText();
                             if (!players.Any() || Confirm("Are you sure that you want to go back? You will lost all already inserted names."))
-                                return null;
+                                return;
                             break;
                         case MenuMapping.QuitKey:
                             if (Confirm("Are you sure that you want to exit game?"))
@@ -259,10 +285,89 @@ namespace CamelUpConsole
                             break;
                     }
                 }
+
+                if (singlePlayerName == string.Empty)
+                {
+                    players.AddRange(Collections.Names.GetRandom(playersCount));
+                    singlePlayerName = players.First();
+                    break;
+                }
             }
 
             MenuBar.Settings.ResetSelectionText();
-            return new Game(players);
+            game = new Game(players);
+            return;
+        }
+
+        private static void Gameplay()
+        {
+            GameBoard gameBoard = new(game);
+            renderPage = renderMenu = true;
+            while (true)
+            {
+                if (renderPage)
+                {
+                    gameBoard.Render();
+                }
+
+                if (renderMenu)
+                {
+                    MenuBar.Render(MenuMapping.GetGameOptions(game), MenuLevels.GameActionChoose);
+                    MenuBar.PrintMessage("Work in progress");
+                }
+
+                renderPage = true;
+                renderMenu = true;
+                switch ((keyInfo = Console.ReadKey(true)).Key)
+                {
+                    case ConsoleKey.D:
+                        // DRAW DICE
+                        game.DrawDice();
+                        break;
+                    case ConsoleKey.C:
+                        if (!game.AvailableTypingCards.Any())
+                        {
+                            MenuBar.PrintNoSupportedKeyError(keyInfo);
+                            renderPage = renderMenu = false;
+                            break;
+                        }
+                        // DRAW TYPING CARD
+                        game.DrawTypingCard(game.AvailableTypingCards.GetRandom());
+                        break;
+                    case ConsoleKey.A:
+                        if (!game.AudienceTileAvailableFields.Any())
+                        {
+                            MenuBar.PrintNoSupportedKeyError(keyInfo);
+                            renderPage = renderMenu = false;
+                            break;
+                        }
+                        // PUT AUDIENCE TILE
+                        game.PlaceAudienceTile(game.AudienceTileAvailableFields.GetRandom(), CamelUpEngine.Core.Enums.AudienceTileSide.Cheering);
+                        break;
+                    case ConsoleKey.B:
+                        if (!game.AvailableBetCards.Any())
+                        {
+                            MenuBar.PrintNoSupportedKeyError(keyInfo);
+                            renderPage = renderMenu = false;
+                            break;
+                        }
+                        // MAKE BET
+                        game.MakeBet(game.AvailableBetCards.GetRandom(), CamelUpEngine.Core.Enums.BetType.Winner);
+                        break;
+                    case MenuMapping.BackKey:
+                        if (Confirm("Are you sure that you want to leave current game"))
+                            return;
+                        break;
+                    case MenuMapping.QuitKey:
+                        if (Confirm("Are you sure that you want to exit game?"))
+                            Environment.Exit(0);
+                        break;
+                    default:
+                        MenuBar.PrintNoSupportedKeyError(keyInfo);
+                        renderPage = renderMenu = false;
+                        break;
+                }
+            }
         }
 
         private static bool Confirm(string message, ConsoleColor color = ConsoleColor.DarkYellow)

@@ -10,6 +10,7 @@
         GameMode,
         HumanPlayersCount,
         MainMenu,
+        MainMenuWithGame,
         Scrollable
     }
 }

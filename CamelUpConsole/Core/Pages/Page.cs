@@ -13,7 +13,7 @@ namespace CamelUpConsole.Core.Pages
 
         protected abstract IReadOnlyCollection<LineRenderInfo> Lines { get; }
 
-        public void Render()
+        public virtual void Render()
         {
             Console.SetCursorPosition(0, 0);
             var linesToRender = Lines.Skip(CurrentLine).Take(LinesToRender).ToList();

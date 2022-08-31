@@ -24,6 +24,7 @@ namespace CamelUpConsole.Core.MenuBar
             Render(MenuMapping.LevelOptions[MenuLevels.Scrollable].Insert(4, option), MenuMapping.LevelOptionsAlignToRight[MenuLevels.Scrollable]);
         }
 
+        public static void Render(Options options, MenuLevels menuLevel) => Render(options, MenuMapping.LevelOptionsAlignToRight[menuLevel]);
         public static void Render(Options options, int optionsToRight = 0)
         {
             RenderFrame();

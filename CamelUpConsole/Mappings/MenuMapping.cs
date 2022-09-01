@@ -19,7 +19,7 @@ namespace CamelUpConsole.Mappings
         public static Options GetGameOptions(Game game) => GetGameOptions(game.AvailableTypingCards.Any(), game.AudienceTileAvailableFields.Any(), game.AvailableBetCards.Any());
         public static Options GetGameOptions(bool typingCardAvailalbe, bool audienceTileAvailable, bool betAvailable)
         {
-            Options options = new("D Draw dice ", new Option(BackKey.ToString().Substring(0, 3), " End game "), ExitGame);
+            Options options = new("D Draw dice ", new Option("↑↓", " Scroll history "), new Option(BackKey.ToString().Substring(0, 3), " End game "), ExitGame);
             if (betAvailable)
                 options = options.Insert(1, new("B Make bet "));
             if (audienceTileAvailable)
@@ -36,10 +36,11 @@ namespace CamelUpConsole.Mappings
             [MenuLevels.Confirmation] = new(new Option("Y|Enter", " Yes "), new Option("N|Esc", " No ")),
             [MenuLevels.AddedSomePlayer] = new(new Option("Del", " Remove last player "), GoBack, ExitGame),
             [MenuLevels.GameMode] = new("S Singleplayer ", "M Multiplayer ", GoBack, ExitGame),
+            [MenuLevels.GameTurnOver] = new("N Go to next turn ", new Option("↑↓", " Scroll history "), GoBack, ExitGame),
             [MenuLevels.HumanPlayersCount] = new("3 Three ", "4 Four ", "5 Five ", "6 Six ", "7 Seven ", "8 Eight ", GoBack, ExitGame),
             [MenuLevels.MainMenu] = new("N New game ", "A About game ", ExitGame),
             [MenuLevels.MainMenuWithGame] = new("N New game ", "C Continue last game ", "A About game ", ExitGame),
-            [MenuLevels.Scrollable] = new("↑ Sroll up ", "↓ Sroll down ", new Option("PgUp", " Page up "), new Option("PgDn", " Page down "), GoBack, ExitGame)
+            [MenuLevels.Scrollable] = new("↑ Scroll up ", "↓ Scroll down ", new Option("PgUp", " Page up "), new Option("PgDn", " Page down "), GoBack, ExitGame)
         };
 
         public static IReadOnlyDictionary<MenuLevels, int> LevelOptionsAlignToRight { get; } = new Dictionary<MenuLevels, int>()
@@ -49,6 +50,7 @@ namespace CamelUpConsole.Mappings
             [MenuLevels.ComputerPlayersCount] = 2,
             [MenuLevels.Confirmation] = 0,
             [MenuLevels.GameActionChoose] = 2,
+            [MenuLevels.GameTurnOver] = 2,
             [MenuLevels.GameMode] = 2,
             [MenuLevels.HumanPlayersCount] = 2,
             [MenuLevels.MainMenu] = 2,

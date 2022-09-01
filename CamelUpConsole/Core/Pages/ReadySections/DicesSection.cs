@@ -12,7 +12,7 @@ namespace CamelUpConsole.Core.Pages.ReadySections
     {
         private Game game;
 
-        public DicesSection(Game game) : base(25, 1, 23, 5, true, "Dices")
+        public DicesSection(Game game) : base(62, 1, 23, 5, true, "Dices")
         {
             this.game = game;
         }
@@ -21,31 +21,17 @@ namespace CamelUpConsole.Core.Pages.ReadySections
         {
             if (!game.DrawnDices.Any())
             {
-                Rendered = false;
+                RerenderFrameOrHeader = true;
                 base.Render();
                 return;
             }
 
-            int col = X;
-            int row = Y;
-
-            if (WithFrame)
-            {
-                col += 2;
-                row += 1;
-            }
-
-            if (!string.IsNullOrEmpty(Header))
-            {
-                row += 2;
-            }
-
+            int col = WithFrame ? Dimensions.Inner.X + 1 : Dimensions.Inner.X;
             foreach (IDrawnDice dice in game.DrawnDices)
             {
-                Console.SetCursorPosition(col, row);
+                Console.SetCursorPosition(col, Dimensions.Inner.Y);
                 new LineRenderInfo("  ", TextAligment.None, background: DiceColor[dice.Colour], margin: 0).Render();
                 new LineRenderInfo(Math.Abs(dice.Value).ToString(), TextAligment.None, ConsoleColor.White, ConsoleColor.Black, 0).Render();
-
                 col += 4;
             }
         }

@@ -7,14 +7,20 @@ namespace CamelUpConsole.Core.Pages.ReadyPages
     internal class GameBoard : Page
     {
         private bool rendered = false;
-        private List<Section> sections = new();
+        private List<Section> sections;
         protected override IReadOnlyCollection<LineRenderInfo> Lines => new List<LineRenderInfo>();
 
         public GameBoard(Game game)
         {
-            sections.Add(new PlayersSection(game));
-            //sections.Add(new GraphicDicesSection(game));
-            sections.Add(new DicesSection(game));
+            sections = new List<Section>()
+            {
+                new PlayersSection(game),
+                new DicesSection(game),
+                new CardsSection(game),
+                new BetsSection(game),
+                new CamelsSection(game),
+                new HistorySection(game)
+            };
         }
 
         public override void Render()

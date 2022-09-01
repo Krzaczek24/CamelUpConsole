@@ -2,68 +2,99 @@
 
 namespace CamelUpConsole.Core.Pages
 {
-    internal abstract class Section
+    internal class SectionDimensions
     {
         public int X { get; }
         public int Y { get; }
         public int Width { get; }
         public int Height { get; }
-        public bool WithFrame { get; }
-        public string Header { get; }
-        public ConsoleColor FrameColor { get; }
-        public ConsoleColor HeaderColor { get; }
-        protected bool Rendered { get; set; } = false;
 
-        public Section(int x, int y, int width, int height, bool withFrame = true, string header = null, ConsoleColor frameColor = ConsoleColor.DarkYellow, ConsoleColor headerColor = ConsoleColor.Magenta)
+        public SectionDimensions(int x, int y, int width, int height)
         {
             X = x;
             Y = y;
             Width = width;
             Height = height;
-            WithFrame = withFrame;
-            Header = header;
+        }
+    }
+
+    internal class Dimensions
+    {
+        public SectionDimensions Outer { get; }
+        public SectionDimensions Inner { get; }
+
+        public Dimensions(SectionDimensions outer, SectionDimensions inner)
+        {
+            Inner = inner;
+            Outer = outer;
+        }
+    }
+
+    internal abstract class Section
+    {
+        public Dimensions Dimensions { get; }
+        public bool WithFrame { get; }
+        public string Header { get; }
+        public ConsoleColor FrameColor { get; }
+        public ConsoleColor HeaderColor { get; }
+        protected bool RerenderFrameOrHeader { get; set; } = true;
+
+        public Section(int x, int y, int width, int height, bool withFrame = true, string header = null, ConsoleColor frameColor = ConsoleColor.DarkYellow, ConsoleColor headerColor = ConsoleColor.Magenta)
+        {
+            int innerX = x, innerY = y, innerWidth = width, innerHeight = height;
+
+            if (WithFrame = withFrame)
+            {
+                innerX += 1;
+                innerY += 1;
+                innerWidth -= 2;
+                innerHeight -= 2;
+            }
+
+            if (!string.IsNullOrEmpty(Header = header))
+            {
+                innerY += 2;
+                innerHeight -= 2;
+            }
+
+            Dimensions = new(new(x, y, width, height), new(innerX, innerY, innerWidth, innerHeight));
             FrameColor = frameColor;
             HeaderColor = headerColor;
         }
 
         public virtual void Render()
         {
-            if (!Rendered)
+            if (RerenderFrameOrHeader)
             {
-                Console.SetCursorPosition(X, Y);
+                Console.SetCursorPosition(Dimensions.Outer.X, Dimensions.Outer.Y);
 
                 if (WithFrame)
                 {
                     Console.ForegroundColor = FrameColor;
-                    Console.Write($"+{string.Empty.PadRight(Width - 2, '-')}+");
-                    for (int row = Y + 1; row < Y + Height - 1; row++)
+                    Console.Write($"+{string.Empty.PadRight(Dimensions.Inner.Width, '-')}+");
+                    for (int row = Dimensions.Outer.Y + 1; row < Dimensions.Outer.Y + Dimensions.Outer.Height - 1; row++)
                     {
-                        Console.SetCursorPosition(X, row);
-                        Console.Write($"|{string.Empty.PadRight(Width - 2)}|");
+                        Console.SetCursorPosition(Dimensions.Outer.X, row);
+                        Console.Write($"|{string.Empty.PadRight(Dimensions.Inner.Width)}|");
                     }
-                    Console.SetCursorPosition(X, Y + Height - 1);
-                    Console.Write($"+{string.Empty.PadRight(Width - 2, '-')}+");
-
-                    if (!string.IsNullOrEmpty(Header))
-                    {
-                        Console.SetCursorPosition(X, Y + 2);
-                        Console.Write($"+{string.Empty.PadRight(Width - 2, '-')}+");
-
-                        Console.SetCursorPosition(X + 1, Y + 1);
-                        new LineRenderInfo(Header, Enums.TextAligment.Center, HeaderColor, maxLength: Width - 2).Render();
-                    }
+                    Console.SetCursorPosition(Dimensions.Outer.X, Dimensions.Outer.Y + Dimensions.Outer.Height - 1);
+                    Console.Write($"+{string.Empty.PadRight(Dimensions.Inner.Width, '-')}+");
                 }
-                else if (!string.IsNullOrEmpty(Header))
+
+                if (!string.IsNullOrEmpty(Header))
                 {
-                    Console.SetCursorPosition(X, Y);
-                    new LineRenderInfo(Header, Enums.TextAligment.Center, HeaderColor, maxLength: Width - 2).Render();
-
                     Console.ForegroundColor = FrameColor;
-                    Console.SetCursorPosition(X, Y + 1);
-                    Console.Write(string.Empty.PadRight(Width, '-'));
+                    Console.SetCursorPosition(Dimensions.Outer.X, Dimensions.Inner.Y - 1);
+                    if (WithFrame)
+                        Console.Write($"+{string.Empty.PadRight(Dimensions.Inner.Width, '-')}+");
+                    else
+                        Console.Write(string.Empty.PadRight(Dimensions.Outer.Width, '-'));
+
+                    Console.SetCursorPosition(Dimensions.Inner.X, Dimensions.Inner.Y - 2);
+                    new LineRenderInfo(Header, Enums.TextAligment.Center, HeaderColor, maxLength: Dimensions.Inner.Width).Render();
                 }
 
-                Rendered = true;
+                RerenderFrameOrHeader = false;
             }
         }
     }

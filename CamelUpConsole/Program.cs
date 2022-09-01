@@ -275,7 +275,7 @@ namespace CamelUpConsole
                                 renderMenu = false;
                                 break;
                             }
-                            if (playerName.Length > nameMaxLength)
+                            if (playerName.Length >= nameMaxLength)
                             {
                                 MenuBar.PrintError($"I am so sorry, but player name cannot be longer than {nameMaxLength} characters.");
                                 renderMenu = false;
@@ -312,7 +312,10 @@ namespace CamelUpConsole
 
                 if (renderMenu)
                 {
-                    MenuBar.Render(MenuMapping.GetGameOptions(game), MenuLevels.GameActionChoose);
+                    if (game.TurnIsOver)
+                        MenuBar.Render(MenuLevels.GameTurnOver);
+                    else
+                        MenuBar.Render(MenuMapping.GetGameOptions(game), MenuLevels.GameActionChoose);
                     MenuBar.PrintMessage("Work in progress");
                 }
 
@@ -321,11 +324,17 @@ namespace CamelUpConsole
                 switch ((keyInfo = Console.ReadKey(true)).Key)
                 {
                     case ConsoleKey.D:
+                        if (game.TurnIsOver)
+                        {
+                            MenuBar.PrintNoSupportedKeyError(keyInfo);
+                            renderPage = renderMenu = false;
+                            break;
+                        }
                         // DRAW DICE
                         game.DrawDice();
                         break;
                     case ConsoleKey.C:
-                        if (!game.AvailableTypingCards.Any())
+                        if (!game.AvailableTypingCards.Any() || game.TurnIsOver)
                         {
                             MenuBar.PrintNoSupportedKeyError(keyInfo);
                             renderPage = renderMenu = false;
@@ -335,7 +344,7 @@ namespace CamelUpConsole
                         game.DrawTypingCard(game.AvailableTypingCards.GetRandom());
                         break;
                     case ConsoleKey.A:
-                        if (!game.AudienceTileAvailableFields.Any())
+                        if (!game.AudienceTileAvailableFields.Any() || game.TurnIsOver)
                         {
                             MenuBar.PrintNoSupportedKeyError(keyInfo);
                             renderPage = renderMenu = false;
@@ -345,7 +354,7 @@ namespace CamelUpConsole
                         game.PlaceAudienceTile(game.AudienceTileAvailableFields.GetRandom(), CamelUpEngine.Core.Enums.AudienceTileSide.Cheering);
                         break;
                     case ConsoleKey.B:
-                        if (!game.AvailableBetCards.Any())
+                        if (!game.AvailableBetCards.Any() || game.TurnIsOver)
                         {
                             MenuBar.PrintNoSupportedKeyError(keyInfo);
                             renderPage = renderMenu = false;
@@ -353,6 +362,15 @@ namespace CamelUpConsole
                         }
                         // MAKE BET
                         game.MakeBet(game.AvailableBetCards.GetRandom(), CamelUpEngine.Core.Enums.BetType.Winner);
+                        break;
+                    case ConsoleKey.N:
+                        if (!game.TurnIsOver)
+                        {
+                            MenuBar.PrintNoSupportedKeyError(keyInfo);
+                            renderPage = renderMenu = false;
+                            break;
+                        }
+                        game.GoToNextTurn();
                         break;
                     case MenuMapping.BackKey:
                         if (Confirm("Are you sure that you want to leave current game"))

@@ -295,6 +295,7 @@ namespace CamelUpConsole
             return;
         }
 
+        // TODO: Gameplay for Single and Multi
         private static void Gameplay()
         {
             GameBoard gameBoard = new(game);
@@ -323,8 +324,9 @@ namespace CamelUpConsole
                             renderPage = renderMenu = false;
                             break;
                         }
-                        // DRAW DICE
+                        // TODO: DRAW DICE
                         game.DrawDice();
+                        gameBoard.History.Reset();
                         break;
                     case ConsoleKey.C:
                         if (!game.AvailableTypingCards.Any() || game.TurnIsOver)
@@ -333,8 +335,9 @@ namespace CamelUpConsole
                             renderPage = renderMenu = false;
                             break;
                         }
-                        // DRAW TYPING CARD
+                        // TODO: DRAW TYPING CARD
                         game.DrawTypingCard(game.AvailableTypingCards.GetRandom());
+                        gameBoard.History.Reset();
                         break;
                     case ConsoleKey.A:
                         if (!game.AudienceTileAvailableFields.Any() || game.TurnIsOver)
@@ -343,8 +346,9 @@ namespace CamelUpConsole
                             renderPage = renderMenu = false;
                             break;
                         }
-                        // PUT AUDIENCE TILE
+                        // TODO: PUT AUDIENCE TILE
                         game.PlaceAudienceTile(game.AudienceTileAvailableFields.GetRandom(), CamelUpEngine.Core.Enums.AudienceTileSide.Cheering);
+                        gameBoard.History.Reset();
                         break;
                     case ConsoleKey.B:
                         if (!game.AvailableBetCards.Any() || game.TurnIsOver)
@@ -353,8 +357,9 @@ namespace CamelUpConsole
                             renderPage = renderMenu = false;
                             break;
                         }
-                        // MAKE BET
+                        // TODO: MAKE BET
                         game.MakeBet(game.AvailableBetCards.GetRandom(), CamelUpEngine.Core.Enums.BetType.Winner);
+                        gameBoard.History.Reset();
                         break;
                     case ConsoleKey.N:
                         if (!game.TurnIsOver)
@@ -364,6 +369,22 @@ namespace CamelUpConsole
                             break;
                         }
                         game.GoToNextTurn();
+                        gameBoard.History.Reset();
+                        break;
+                    case ConsoleKey.UpArrow:
+                        gameBoard.History.ScrollUp();
+                        break;
+                    case ConsoleKey.DownArrow:
+                        gameBoard.History.ScrollDown();
+                        break;
+                    case ConsoleKey.PageUp:
+                        gameBoard.History.PageUp();
+                        break;
+                    case ConsoleKey.PageDown:
+                        gameBoard.History.PageDown();
+                        break;
+                    case ConsoleKey.Spacebar:
+                        gameBoard.History.Reset();
                         break;
                     case MenuMapping.BackKey:
                         if (Confirm("Are you sure that you want to leave current game"))
@@ -459,19 +480,6 @@ namespace CamelUpConsole
                         renderPage = renderMenu = false;
                         break;
                 }
-            }
-        }
-
-        private static void TestAscii()
-        {
-            for (int c = 0; c < 1024; c++)
-            {
-                try
-                {
-                    Console.Write($"{c} = ");
-                    Console.WriteLine((char)c);
-                }
-                catch { }
             }
         }
     }

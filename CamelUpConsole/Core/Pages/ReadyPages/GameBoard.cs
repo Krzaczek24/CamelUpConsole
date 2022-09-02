@@ -8,7 +8,10 @@ namespace CamelUpConsole.Core.Pages.ReadyPages
     {
         private bool rendered = false;
         private List<Section> sections;
+
         protected override IReadOnlyCollection<LineRenderInfo> Lines => new List<LineRenderInfo>();
+
+        public HistorySection History { get; }
 
         public GameBoard(Game game)
         {
@@ -19,7 +22,7 @@ namespace CamelUpConsole.Core.Pages.ReadyPages
                 new CardsSection(game, 14, 15, 11, 9, true),
                 new BetsSection(game, 26, 15, 14, 6, true),
                 new CamelsSection(game, 42, 1, 76, 13),
-                new HistorySection(game, 42, 15, 76, 11)
+                (History = new HistorySection(game, 42, 15, 76, 11))
             };
         }
 

@@ -118,20 +118,21 @@ namespace CamelUpConsole.Core.Actions
 
         private static ActionEventDescription EndOfTurn(IActionEvent @event)
         {
-            return new ActionEventDescription($"End of turn - all dices has been drawn", ConsoleColor.Magenta);
+            return new ActionEventDescription($"End of turn - all dices has been drawn or game is over", ConsoleColor.Magenta);
         }
 
         private static ActionEventDescription GameOver(IActionEvent @event)
         {
-            // TODO: Nie wyświetla się
-
             var e = (IGameOverEvent)@event;
 
             string firstCamelColor = e.FirstCamel.Colour.ToString().ToLower();
             string lastCamelColor = e.LastCamel.Colour.ToString().ToLower();
-            IList<string> players = e.Winners.Select(p => p.Name).ToList();
-
-            return new ActionEventDescription($"Game over - some camel reach finish line\nThe fastest camel is {firstCamelColor}\nThe slowest camel is {lastCamelColor}\nPlayers order:\n{string.Join("\n", players)}", ConsoleColor.Magenta);
+            IList<string> players = e.Winners.Select(p => p.Name.PadRight(14)).ToList();
+            IList<string> ranking = new List<string>() { string.Empty, string.Empty, string.Empty, string.Empty };
+            int index = 0;
+            foreach (string player in players)
+                ranking[index++ % ranking.Count] += $"{index}. {player}";
+            return new ActionEventDescription($"Game over - fastest was {firstCamelColor} camel and slowest one is {lastCamelColor} camel\nPlayers ranking:\n{string.Join("\n", ranking)}", ConsoleColor.Blue);
         }
 
         private static ActionEventDescription MadCamelColourSwitched(IActionEvent @event)

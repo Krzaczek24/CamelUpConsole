@@ -24,6 +24,8 @@ namespace CamelUpConsole.Core.Pages.ReadyPages
                 new CamelsSection(game, 42, 1, 76, 13),
                 (History = new HistorySection(game, 42, 15, 76, 11))
             };
+
+            History.Reset();
         }
 
         public override void Render()

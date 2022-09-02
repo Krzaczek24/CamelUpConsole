@@ -63,7 +63,7 @@ namespace CamelUpConsole
                 {
                     case ConsoleKey.N:
                         NewGame();
-                        menuLevel = game?.GameIsOver ?? true ? MenuLevels.MainMenu : MenuLevels.MainMenuWithGame;
+                        menuLevel = game == null ? MenuLevels.MainMenu : MenuLevels.MainMenuWithGame;
                         break;
                     case ConsoleKey.A:
                         About();
@@ -73,7 +73,6 @@ namespace CamelUpConsole
                         if (menuLevel == MenuLevels.MainMenuWithGame)
                         {
                             Gameplay();
-                            menuLevel = game?.GameIsOver ?? true ? MenuLevels.MainMenu : MenuLevels.MainMenuWithGame;
                             break;
                         }
                         MenuBar.PrintNoSupportedKeyError(keyInfo);
@@ -334,7 +333,7 @@ namespace CamelUpConsole
                 switch ((keyInfo = Console.ReadKey(true)).Key)
                 {
                     case ConsoleKey.D:
-                        if (game.TurnIsOver)
+                        if (game.TurnIsOver || game.GameIsOver)
                         {
                             MenuBar.PrintNoSupportedKeyError(keyInfo);
                             renderPage = renderMenu = false;
@@ -345,7 +344,7 @@ namespace CamelUpConsole
                         gameBoard.History.Reset();
                         break;
                     case ConsoleKey.C:
-                        if (!game.AvailableTypingCards.Any() || game.TurnIsOver)
+                        if (!game.AvailableTypingCards.Any() || game.TurnIsOver || game.GameIsOver)
                         {
                             MenuBar.PrintNoSupportedKeyError(keyInfo);
                             renderPage = renderMenu = false;
@@ -356,7 +355,7 @@ namespace CamelUpConsole
                         gameBoard.History.Reset();
                         break;
                     case ConsoleKey.A:
-                        if (!game.AudienceTileAvailableFields.Any() || game.TurnIsOver)
+                        if (!game.AudienceTileAvailableFields.Any() || game.TurnIsOver || game.GameIsOver)
                         {
                             MenuBar.PrintNoSupportedKeyError(keyInfo);
                             renderPage = renderMenu = false;
@@ -367,7 +366,7 @@ namespace CamelUpConsole
                         gameBoard.History.Reset();
                         break;
                     case ConsoleKey.B:
-                        if (!game.AvailableBetCards.Any() || game.TurnIsOver)
+                        if (!game.AvailableBetCards.Any() || game.TurnIsOver || game.GameIsOver)
                         {
                             MenuBar.PrintNoSupportedKeyError(keyInfo);
                             renderPage = renderMenu = false;
@@ -378,7 +377,7 @@ namespace CamelUpConsole
                         gameBoard.History.Reset();
                         break;
                     case ConsoleKey.N:
-                        if (!game.TurnIsOver)
+                        if (!game.TurnIsOver || game.GameIsOver)
                         {
                             MenuBar.PrintNoSupportedKeyError(keyInfo);
                             renderPage = renderMenu = false;

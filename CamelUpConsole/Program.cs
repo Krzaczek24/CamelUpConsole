@@ -1,5 +1,7 @@
 ﻿using CamelUpConsole.Constants;
 using CamelUpConsole.Core.MenuBar;
+using CamelUpConsole.Core.MenuBar.Models;
+using CamelUpConsole.Core.Pages;
 using CamelUpConsole.Core.Pages.ReadyPages;
 using CamelUpConsole.Enums;
 using CamelUpConsole.Mappings;
@@ -323,7 +325,7 @@ namespace CamelUpConsole
 
                 if (renderMenu)
                 {
-                    MenuBar.Render(MenuMapping.GetGameOptions(game), MenuLevels.GameActionChoose);
+                    MenuBar.Render(game, gameBoard);
                     MenuBar.PrintMessage("Work in progress");
                 }
 
@@ -388,28 +390,28 @@ namespace CamelUpConsole
                         break;
                     case ConsoleKey.UpArrow:
                         gameBoard.History.ScrollUp();
-                        renderPage = renderMenu = false;
-                        renderHistory = true;
+                        renderPage = false;
+                        renderMenu = renderHistory = true;
                         break;
                     case ConsoleKey.DownArrow:
                         gameBoard.History.ScrollDown();
-                        renderPage = renderMenu = false;
-                        renderHistory = true;
+                        renderPage = false;
+                        renderMenu = renderHistory = true;
                         break;
                     case ConsoleKey.PageUp:
                         gameBoard.History.PageUp();
-                        renderPage = renderMenu = false;
-                        renderHistory = true;
+                        renderPage = false;
+                        renderMenu = renderHistory = true;
                         break;
                     case ConsoleKey.PageDown:
                         gameBoard.History.PageDown();
-                        renderPage = renderMenu = false;
-                        renderHistory = true;
+                        renderPage = false;
+                        renderMenu = renderHistory = true;
                         break;
                     case ConsoleKey.Spacebar:
                         gameBoard.History.Reset();
-                        renderPage = renderMenu = false;
-                        renderHistory = true;
+                        renderPage = false;
+                        renderMenu = renderHistory = true;
                         break;
                     case MenuMapping.BackKey:
                         if (Confirm("Are you sure that you want to leave current game"))

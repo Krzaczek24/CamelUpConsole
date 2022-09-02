@@ -16,21 +16,35 @@ namespace CamelUpConsole.Mappings
         private static Option GoBack => new Option(BackKey.ToString().Substring(0, 3), " Go back ");
         private static Option ExitApp => new Option(QuitKey.ToString(), " Quit app ");
 
-        public static Options GetGameOptions(Game game)
+        public static Options GetGameOptions(Game game, DynamicOption historyProgress = null)
         {
+            Options options;
+
             if (game.GameIsOver)
-                return new(new Option("↑↓", " Scroll history "), GoBack, ExitApp);
+            {
+                options = new(new Option("↑↓", " Scroll history "), GoBack, ExitApp);
+                if (historyProgress != null)
+                    options = options.Insert(1, historyProgress);
+                return options;
+            }
 
             if (game.TurnIsOver)
-                return new("N Go to next turn ", new Option("↑↓", " Scroll history "), GoBack, ExitApp);
+            {
+                options = new("N Go to next turn ", new Option("↑↓", " Scroll history "), GoBack, ExitApp);
+                if (historyProgress != null)
+                    options = options.Insert(2, historyProgress);
+                return options;
+            }
 
-            Options options = new("D Draw dice ", new Option("↑↓", " Scroll history "), new Option(BackKey.ToString().Substring(0, 3), " Leave game "), ExitApp);
+            options = new("D Draw dice ", new Option("↑↓", " Scroll history "), new Option(BackKey.ToString().Substring(0, 3), " Leave game "), ExitApp);
+            if (historyProgress != null)
+                options = options.Insert(2, historyProgress);
             if (game.AvailableBetCards.Any())
                 options = options.Insert(1, new("B Make bet "));
             if (game.AudienceTileAvailableFields.Any())
                 options = options.Insert(1, new("A Put audience tile "));
             if (game.AvailableTypingCards.Any())
-                options = options.Insert(1, new("C Draw typing card "));
+                options = options.Insert(1, new("C Draw card "));
             return options;
         }
 

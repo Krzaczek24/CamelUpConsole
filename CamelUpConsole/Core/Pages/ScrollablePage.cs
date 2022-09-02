@@ -2,7 +2,7 @@
 
 namespace CamelUpConsole.Core.Pages
 {
-    internal abstract class ScrollablePage : Page
+    internal abstract class ScrollablePage : Page, IScrollable
     {
         public override bool OverrideRemainingLines => false;
 

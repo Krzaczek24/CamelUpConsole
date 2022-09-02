@@ -1,7 +1,9 @@
 ﻿using CamelUpConsole.Core.MenuBar.Models;
 using CamelUpConsole.Core.Pages;
+using CamelUpConsole.Core.Pages.ReadyPages;
 using CamelUpConsole.Enums;
 using CamelUpConsole.Mappings;
+using CamelUpEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +24,12 @@ namespace CamelUpConsole.Core.MenuBar
         {
             DynamicOption option = new("Line", GetProgressFunction(scrollablePage, progressType));
             Render(MenuMapping.LevelOptions[MenuLevels.Scrollable].Insert(4, option), MenuMapping.LevelOptionsAlignToRight[MenuLevels.Scrollable]);
+        }
+
+        public static void Render(Game game, GameBoard gameBoardPage, ScrollableProgressType progressType = ScrollableProgressType.Position)
+        {
+            DynamicOption option = new(string.Empty, GetProgressFunction(gameBoardPage.History, progressType));
+            Render(MenuMapping.GetGameOptions(game, option), MenuMapping.LevelOptionsAlignToRight[MenuLevels.GameActionChoose]);
         }
 
         public static void Render(Options options, MenuLevels menuLevel) => Render(options, MenuMapping.LevelOptionsAlignToRight[menuLevel]);
@@ -140,18 +148,18 @@ namespace CamelUpConsole.Core.MenuBar
             return option.Key.Length + description.Length;
         }
 
-        private static Func<string> GetProgressFunction(ScrollablePage scrollablePage, ScrollableProgressType progressType)
+        private static Func<string> GetProgressFunction(IScrollable scrollable, ScrollableProgressType progressType)
         {
             switch (progressType)
             {
                 case ScrollableProgressType.None:
                     return () => string.Empty;
                 case ScrollableProgressType.Position:
-                    return () => $" {scrollablePage.LinesProgress}/{scrollablePage.LinesCount} ";
+                    return () => $" {scrollable.LinesProgress}/{scrollable.LinesCount} ";
                 case ScrollableProgressType.Percent:
-                    return () => $" {scrollablePage.Percent}% ";
+                    return () => $" {scrollable.Percent}% ";
                 case ScrollableProgressType.Both:
-                    return () => $" {scrollablePage.LinesProgress}/{scrollablePage.LinesCount} ({scrollablePage.Percent}%) ";
+                    return () => $" {scrollable.LinesProgress}/{scrollable.LinesCount} ({scrollable.Percent}%) ";
                 default:
                     throw new NotImplementedException($"Unknown value [{progressType}] of {nameof(ScrollableProgressType)}");
             }

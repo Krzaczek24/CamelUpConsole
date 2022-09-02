@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace CamelUpConsole.Core.Pages.ReadySections
 {
-    internal class HistorySection : Section
+    internal class HistorySection : Section, IScrollable
     {
         private Game game;
 

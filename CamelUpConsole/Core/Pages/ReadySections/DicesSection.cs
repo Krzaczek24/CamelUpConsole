@@ -1,10 +1,9 @@
 ﻿using CamelUpConsole.Enums;
-using CamelUpEngine.Core.Enums;
 using CamelUpEngine.GameObjects;
 using CamelUpEngine;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using CamelUpConsole.Mappings;
 
 namespace CamelUpConsole.Core.Pages.ReadySections
 {
@@ -12,7 +11,7 @@ namespace CamelUpConsole.Core.Pages.ReadySections
     {
         private Game game;
 
-        public DicesSection(Game game) : base(62, 1, 23, 5, true, "Dices")
+        public DicesSection(Game game, int x, int y, int width, int height, bool vertical = false) : base(x, y, width, height, true, "Dices", vertical: vertical)
         {
             this.game = game;
         }
@@ -26,25 +25,25 @@ namespace CamelUpConsole.Core.Pages.ReadySections
                 return;
             }
 
-            int col = WithFrame ? Dimensions.Inner.X + 1 : Dimensions.Inner.X;
+            int col = Dimensions.Inner.X;
+            int row = Dimensions.Inner.Y;
+
+            if (WithFrame)
+                col += 2;
+            if (Vertical)
+                col++;
+
             foreach (IDrawnDice dice in game.DrawnDices)
             {
-                Console.SetCursorPosition(col, Dimensions.Inner.Y);
-                new LineRenderInfo("  ", TextAligment.None, background: DiceColor[dice.Colour], margin: 0).Render();
+                Console.SetCursorPosition(col, row);
+                new LineRenderInfo("  ", TextAligment.None, background: ColorMapping.Dice[dice.Colour]).Render();
                 new LineRenderInfo(Math.Abs(dice.Value).ToString(), TextAligment.None, ConsoleColor.White, ConsoleColor.Black, 0).Render();
-                col += 4;
+
+                if (Vertical)
+                    row++;
+                else
+                    col += 4;
             }
         }
-
-        private static readonly IReadOnlyDictionary<Colour, ConsoleColor> DiceColor = new Dictionary<Colour, ConsoleColor>()
-        {
-            [Colour.Red] = ConsoleColor.Red,
-            [Colour.Yellow] = ConsoleColor.DarkYellow,
-            [Colour.Green] = ConsoleColor.Green,
-            [Colour.Blue] = ConsoleColor.Blue,
-            [Colour.Violet] = ConsoleColor.Magenta,
-            [Colour.White] = ConsoleColor.White,
-            [Colour.Black] = ConsoleColor.Black
-        };
     }
 }

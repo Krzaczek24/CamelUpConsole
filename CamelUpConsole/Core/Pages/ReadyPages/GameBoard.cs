@@ -14,12 +14,12 @@ namespace CamelUpConsole.Core.Pages.ReadyPages
         {
             sections = new List<Section>()
             {
-                new PlayersSection(game),
-                new DicesSection(game),
-                new CardsSection(game),
-                new BetsSection(game),
-                new CamelsSection(game),
-                new HistorySection(game)
+                new PlayersSection(game, 2, 1, 38, 13),
+                new DicesSection(game, 2, 15, 11, 9, true),
+                new CardsSection(game, 14, 15, 11, 9, true),
+                new BetsSection(game, 26, 15, 14, 6, true),
+                new CamelsSection(game, 42, 1, 76, 13),
+                new HistorySection(game, 42, 15, 76, 11)
             };
         }
 

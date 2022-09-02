@@ -38,8 +38,9 @@ namespace CamelUpConsole.Core.Pages
         public ConsoleColor FrameColor { get; }
         public ConsoleColor HeaderColor { get; }
         protected bool RerenderFrameOrHeader { get; set; } = true;
+        protected bool Vertical { get; }
 
-        public Section(int x, int y, int width, int height, bool withFrame = true, string header = null, ConsoleColor frameColor = ConsoleColor.DarkYellow, ConsoleColor headerColor = ConsoleColor.Magenta)
+        public Section(int x, int y, int width, int height, bool withFrame = true, string header = null, ConsoleColor frameColor = ConsoleColor.DarkYellow, ConsoleColor headerColor = ConsoleColor.Magenta, bool vertical = false)
         {
             int innerX = x, innerY = y, innerWidth = width, innerHeight = height;
 
@@ -51,7 +52,7 @@ namespace CamelUpConsole.Core.Pages
                 innerHeight -= 2;
             }
 
-            if (!string.IsNullOrEmpty(Header = header))
+            if ((Header = header) != null)
             {
                 innerY += 2;
                 innerHeight -= 2;
@@ -60,10 +61,13 @@ namespace CamelUpConsole.Core.Pages
             Dimensions = new(new(x, y, width, height), new(innerX, innerY, innerWidth, innerHeight));
             FrameColor = frameColor;
             HeaderColor = headerColor;
+            Vertical = vertical;
         }
 
         public virtual void Render()
         {
+            Console.BackgroundColor = ConsoleColor.Black;
+
             if (RerenderFrameOrHeader)
             {
                 Console.SetCursorPosition(Dimensions.Outer.X, Dimensions.Outer.Y);

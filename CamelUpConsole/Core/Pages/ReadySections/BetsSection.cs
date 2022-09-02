@@ -1,9 +1,5 @@
 ﻿using CamelUpConsole.Enums;
 using CamelUpEngine;
-using CamelUpEngine.Core.Enums;
-using CamelUpEngine.GameObjects.Available;
-using CamelUpEngine.Helpers;
-using System.Linq;
 using System;
 
 namespace CamelUpConsole.Core.Pages.ReadySections
@@ -12,7 +8,7 @@ namespace CamelUpConsole.Core.Pages.ReadySections
     {
         private Game game;
 
-        public BetsSection(Game game) : base(42, 1, 18, 5, true, "Bets")
+        public BetsSection(Game game, int x, int y, int width, int height, bool vertical = false) : base(x, y, width, height, true, "Bets", vertical: vertical)
         {
             this.game = game;
         }
@@ -21,11 +17,25 @@ namespace CamelUpConsole.Core.Pages.ReadySections
         {
             base.Render();
 
-            Console.SetCursorPosition(Dimensions.Inner.X, Dimensions.Inner.Y);
-            new LineRenderInfo("Winner:", TextAligment.None, ConsoleColor.White, ConsoleColor.Black, 0).Render();
-            new LineRenderInfo(game.WinnerBets.Count.ToString(), TextAligment.None, ConsoleColor.Green, ConsoleColor.Black, 0).Render();
-            new LineRenderInfo(" Loser:", TextAligment.None, ConsoleColor.White, ConsoleColor.Black, 0).Render();
-            new LineRenderInfo(game.LoserBets.Count.ToString(), TextAligment.None, ConsoleColor.Green, ConsoleColor.Black, 0).Render();
+            if (Vertical)
+            {
+                Console.SetCursorPosition(Dimensions.Inner.X, Dimensions.Inner.Y);
+                new LineRenderInfo("Winner", TextAligment.Left, ConsoleColor.White, ConsoleColor.Black, 0, Dimensions.Inner.Width).Render();
+                Console.SetCursorPosition(Dimensions.Inner.X + Dimensions.Inner.Width - 2, Dimensions.Inner.Y);
+                new LineRenderInfo(game.WinnerBets.Count.ToString().PadLeft(2), TextAligment.None, ConsoleColor.Green, ConsoleColor.Black, 0).Render();
+                Console.SetCursorPosition(Dimensions.Inner.X, Dimensions.Inner.Y + 1);
+                new LineRenderInfo("Loser", TextAligment.Left, ConsoleColor.White, ConsoleColor.Black, 0, Dimensions.Inner.Width).Render();
+                Console.SetCursorPosition(Dimensions.Inner.X + Dimensions.Inner.Width - 2, Dimensions.Inner.Y + 1);
+                new LineRenderInfo(game.LoserBets.Count.ToString().PadLeft(2), TextAligment.None, ConsoleColor.Green, ConsoleColor.Black, 0).Render();
+            }
+            else
+            {
+                Console.SetCursorPosition(Dimensions.Inner.X, Dimensions.Inner.Y);
+                new LineRenderInfo("Winner:", TextAligment.None, ConsoleColor.White, ConsoleColor.Black, 0).Render();
+                new LineRenderInfo(game.WinnerBets.Count.ToString().PadLeft(2), TextAligment.None, ConsoleColor.Green, ConsoleColor.Black, 0).Render();
+                new LineRenderInfo(" Loser:", TextAligment.None, ConsoleColor.White, ConsoleColor.Black, 0).Render();
+                new LineRenderInfo(game.LoserBets.Count.ToString().PadLeft(2), TextAligment.None, ConsoleColor.Green, ConsoleColor.Black, 0).Render();
+            }
         }
     }
 }

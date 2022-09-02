@@ -14,33 +14,37 @@ namespace CamelUpConsole.Mappings
         public const ConsoleKey QuitKey = ConsoleKey.F4;
 
         private static Option GoBack => new Option(BackKey.ToString().Substring(0, 3), " Go back ");
-        private static Option ExitGame => new Option(QuitKey.ToString(), " Quit game ");
+        private static Option ExitApp => new Option(QuitKey.ToString(), " Quit app ");
 
-        public static Options GetGameOptions(Game game) => GetGameOptions(game.AvailableTypingCards.Any(), game.AudienceTileAvailableFields.Any(), game.AvailableBetCards.Any());
-        public static Options GetGameOptions(bool typingCardAvailalbe, bool audienceTileAvailable, bool betAvailable)
+        public static Options GetGameOptions(Game game)
         {
-            Options options = new("D Draw dice ", new Option("↑↓", " Scroll history "), new Option(BackKey.ToString().Substring(0, 3), " End game "), ExitGame);
-            if (betAvailable)
+            if (game.GameIsOver)
+                return new(new Option("↑↓", " Scroll history "), GoBack, ExitApp);
+
+            if (game.TurnIsOver)
+                return new("N Go to next turn ", new Option("↑↓", " Scroll history "), GoBack, ExitApp);
+
+            Options options = new("D Draw dice ", new Option("↑↓", " Scroll history "), new Option(BackKey.ToString().Substring(0, 3), " Leave game "), ExitApp);
+            if (game.AvailableBetCards.Any())
                 options = options.Insert(1, new("B Make bet "));
-            if (audienceTileAvailable)
+            if (game.AudienceTileAvailableFields.Any())
                 options = options.Insert(1, new("A Put audience tile "));
-            if (typingCardAvailalbe)
+            if (game.AvailableTypingCards.Any())
                 options = options.Insert(1, new("C Draw typing card "));
             return options;
         }
 
         public static IReadOnlyDictionary<MenuLevels, Options> LevelOptions { get; } = new Dictionary<MenuLevels, Options>()
         {
-            [MenuLevels.BackOrQuit] = new Options(GoBack, ExitGame),
-            [MenuLevels.ComputerPlayersCount] = new("2 Two ", "3 Three ", "4 Four ", "5 Five ", "6 Six ", "7 Seven ", GoBack, ExitGame),
+            [MenuLevels.BackOrQuit] = new Options(GoBack, ExitApp),
+            [MenuLevels.ComputerPlayersCount] = new("2 Two ", "3 Three ", "4 Four ", "5 Five ", "6 Six ", "7 Seven ", GoBack, ExitApp),
             [MenuLevels.Confirmation] = new(new Option("Y|Enter", " Yes "), new Option("N|Esc", " No ")),
-            [MenuLevels.AddedSomePlayer] = new(new Option("Del", " Remove last player "), GoBack, ExitGame),
-            [MenuLevels.GameMode] = new("S Singleplayer ", "M Multiplayer ", GoBack, ExitGame),
-            [MenuLevels.GameTurnOver] = new("N Go to next turn ", new Option("↑↓", " Scroll history "), GoBack, ExitGame),
-            [MenuLevels.HumanPlayersCount] = new("3 Three ", "4 Four ", "5 Five ", "6 Six ", "7 Seven ", "8 Eight ", GoBack, ExitGame),
-            [MenuLevels.MainMenu] = new("N New game ", "A About game ", ExitGame),
-            [MenuLevels.MainMenuWithGame] = new("N New game ", "C Continue last game ", "A About game ", ExitGame),
-            [MenuLevels.Scrollable] = new("↑ Scroll up ", "↓ Scroll down ", new Option("PgUp", " Page up "), new Option("PgDn", " Page down "), GoBack, ExitGame)
+            [MenuLevels.AddedSomePlayer] = new(new Option("Del", " Remove last player "), GoBack, ExitApp),
+            [MenuLevels.GameMode] = new("S Singleplayer ", "M Multiplayer ", GoBack, ExitApp),
+            [MenuLevels.HumanPlayersCount] = new("3 Three ", "4 Four ", "5 Five ", "6 Six ", "7 Seven ", "8 Eight ", GoBack, ExitApp),
+            [MenuLevels.MainMenu] = new("N New game ", "A About game ", ExitApp),
+            [MenuLevels.MainMenuWithGame] = new("N New game ", "C Continue game ", "A About game ", ExitApp),
+            [MenuLevels.Scrollable] = new("↑ Scroll up ", "↓ Scroll down ", new Option("PgUp", " Page up "), new Option("PgDn", " Page down "), GoBack, ExitApp)
         };
 
         public static IReadOnlyDictionary<MenuLevels, int> LevelOptionsAlignToRight { get; } = new Dictionary<MenuLevels, int>()
@@ -50,7 +54,6 @@ namespace CamelUpConsole.Mappings
             [MenuLevels.ComputerPlayersCount] = 2,
             [MenuLevels.Confirmation] = 0,
             [MenuLevels.GameActionChoose] = 2,
-            [MenuLevels.GameTurnOver] = 2,
             [MenuLevels.GameMode] = 2,
             [MenuLevels.HumanPlayersCount] = 2,
             [MenuLevels.MainMenu] = 2,

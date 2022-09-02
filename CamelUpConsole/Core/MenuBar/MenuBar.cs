@@ -39,7 +39,7 @@ namespace CamelUpConsole.Core.MenuBar
             if (unsupportedKeys.Contains(keyInfo.Key) || keyInfo.KeyChar == '\0')
                 keyString = keyInfo.Key.ToString();
             else
-                keyString = keyInfo.KeyChar.ToString();
+                keyString = keyInfo.KeyChar.ToString().ToUpper();
             PrintError($"There is no action available for [{keyString}] key");
         }
         public static void PrintError(string message) => PrintMessage(message, ConsoleColor.DarkRed);
@@ -83,7 +83,7 @@ namespace CamelUpConsole.Core.MenuBar
                 else if (Settings.FrameType == MenuFrameType.Line)
                 {
                     Console.SetCursorPosition(0, Console.WindowHeight - 4);
-                    new LineRenderInfo(string.Empty.PadRight(Console.WindowWidth, (char)713), TextAligment.Left, margin: 0).Render();
+                    new LineRenderInfo(string.Empty.PadRight(Console.WindowWidth, (char)713), TextAligment.Left).Render();
 
                     for (int row = Console.WindowHeight - 3; row < Console.WindowHeight; row++)
                     {

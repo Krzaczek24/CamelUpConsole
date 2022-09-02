@@ -21,10 +21,6 @@ namespace CamelUpConsole
 
         static void Main(string[] args)
         {
-            //TestAscii();
-            //Console.ReadLine();
-            //return;
-
             if (OperatingSystem.IsWindows())
             {
                 const int width = 120;
@@ -312,10 +308,7 @@ namespace CamelUpConsole
 
                 if (renderMenu)
                 {
-                    if (game.TurnIsOver)
-                        MenuBar.Render(MenuLevels.GameTurnOver);
-                    else
-                        MenuBar.Render(MenuMapping.GetGameOptions(game), MenuLevels.GameActionChoose);
+                    MenuBar.Render(MenuMapping.GetGameOptions(game), MenuLevels.GameActionChoose);
                     MenuBar.PrintMessage("Work in progress");
                 }
 

@@ -1,6 +1,6 @@
-﻿using CamelUpConsole.Enums;
+﻿using CamelUpConsole.Core.Actions;
+using CamelUpConsole.Enums;
 using CamelUpEngine;
-using CamelUpEngine.Core.Actions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace CamelUpConsole.Core.Pages.ReadySections
     {
         private Game game;
 
-        public HistorySection(Game game) : base(2, 14, 38, 11, true, "History")
+        public HistorySection(Game game, int x, int y, int width, int height, bool withFrame = true, string header = "History") : base(x, y, width, height, withFrame, header)
         {
             this.game = game;
         }
@@ -21,11 +21,11 @@ namespace CamelUpConsole.Core.Pages.ReadySections
             base.Render();
 
             int row = Dimensions.Inner.Y;
-            IList<IActionEvent> actions = game.History.TakeLast(Dimensions.Inner.Height).ToList();
-            foreach (IActionEvent action in actions)
+            IList<ActionEventDescription> actions = game.History.GetPrettyDescription().TakeLast(Dimensions.Inner.Height).ToList();
+            foreach (ActionEventDescription action in actions)
             {
                 Console.SetCursorPosition(Dimensions.Inner.X, row++);
-                new LineRenderInfo(action.GetType().Name, TextAligment.None, ConsoleColor.White, ConsoleColor.Black, 0, Dimensions.Inner.Width).Render();
+                new LineRenderInfo(action.Text, TextAligment.Left, action.ForegroundColor, action.BackgroundColor, 0, Dimensions.Inner.Width).Render();
             }
 
             if (actions.Count >= Dimensions.Inner.Height)

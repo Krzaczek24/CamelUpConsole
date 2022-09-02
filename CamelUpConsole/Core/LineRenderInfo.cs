@@ -5,7 +5,6 @@ namespace CamelUpConsole.Core
 {
     internal class LineRenderInfo
     {
-        private const int MARGIN_DEFAULT = 1;
         public string Text { get; set; } = string.Empty;
         public TextAligment TextAligment { get; set; }
         public int Margin { get; set; }
@@ -15,7 +14,7 @@ namespace CamelUpConsole.Core
 
         public static LineRenderInfo BlankLine { get; } = new LineRenderInfo(string.Empty);
 
-        public LineRenderInfo(string text, TextAligment aligment = TextAligment.Left, ConsoleColor? foreground = null, ConsoleColor? background = null, int margin = MARGIN_DEFAULT, int maxLength = 0)
+        public LineRenderInfo(string text, TextAligment aligment = TextAligment.Left, ConsoleColor? foreground = null, ConsoleColor? background = null, int margin = 0, int maxLength = 0)
         {
             Text = text;
             TextAligment = aligment;
@@ -53,7 +52,7 @@ namespace CamelUpConsole.Core
             Console.Write(formattedText);
         }
 
-        public static string CenteredFullLine(string str, int margin = MARGIN_DEFAULT, int maxWidth = 0)
+        public static string CenteredFullLine(string str, int margin = 0, int maxWidth = 0)
         {
             maxWidth = maxWidth > 0 ? maxWidth : Console.WindowWidth;
             int lengthWithMargins = str.Length + 2 * margin;
@@ -68,13 +67,13 @@ namespace CamelUpConsole.Core
             return str.PadLeft(margin + str.Length).PadRight(maxWidth);
         }
 
-        public static string ToLeftFullLine(string str, int margin = MARGIN_DEFAULT, int maxWidth = 0)
+        public static string ToLeftFullLine(string str, int margin = 0, int maxWidth = 0)
         {
             maxWidth = maxWidth > 0 ? maxWidth : Console.WindowWidth;
             return str.PadLeft(margin + str.Length).PadRight(maxWidth);
         }
 
-        public static string ToRightFullLine(string str, int margin = MARGIN_DEFAULT, int maxWidth = 0)
+        public static string ToRightFullLine(string str, int margin = 0, int maxWidth = 0)
         {
             maxWidth = maxWidth > 0 ? maxWidth : Console.WindowWidth;
             return str.PadRight(margin + str.Length).PadLeft(maxWidth);

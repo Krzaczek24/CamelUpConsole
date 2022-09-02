@@ -8,7 +8,6 @@
         Confirmation,
         GameActionChoose,
         GameMode,
-        GameTurnOver,
         HumanPlayersCount,
         MainMenu,
         MainMenuWithGame,

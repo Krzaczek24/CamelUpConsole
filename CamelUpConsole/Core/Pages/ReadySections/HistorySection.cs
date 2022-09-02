@@ -13,7 +13,7 @@ namespace CamelUpConsole.Core.Pages.ReadySections
 
         public int CurrentLine { get; private set; } = 0;
 
-        public int LinesCount => game.History.Count;
+        public int LinesCount => game.History.GetPrettyDescription().Count();
         public int Percent => CurrentLine * 100 / (LinesCount - Dimensions.Inner.Height);
         public int LinesProgress => CurrentLine * LinesCount / (LinesCount - Dimensions.Inner.Height);
 

@@ -18,12 +18,7 @@ namespace CamelUpConsole.Core.Pages.ReadySections
 
         public override void Render()
         {
-            if (!game.DrawnDices.Any())
-            {
-                RerenderFrameOrHeader = true;
-                base.Render();
-                return;
-            }
+            base.Render();
 
             int col = Dimensions.Inner.X;
             int row = Dimensions.Inner.Y;
@@ -33,11 +28,20 @@ namespace CamelUpConsole.Core.Pages.ReadySections
             if (Vertical)
                 col++;
 
-            foreach (IDrawnDice dice in game.DrawnDices)
+            for (int i = 0; i < 5; i++)
             {
                 Console.SetCursorPosition(col, row);
-                new LineRenderInfo("  ", TextAligment.None, background: ColorMapping.Dice[dice.Colour]).Render();
-                new LineRenderInfo(Math.Abs(dice.Value).ToString(), TextAligment.None, ConsoleColor.White, ConsoleColor.Black, 0).Render();
+
+                IDrawnDice dice = game.DrawnDices.Skip(i).FirstOrDefault();
+                if (dice != null)
+                {
+                    new LineRenderInfo("  ", TextAligment.None, background: ColorMapping.Dice[dice.Colour]).Render();
+                    new LineRenderInfo(Math.Abs(dice.Value).ToString(), TextAligment.None, ConsoleColor.White, ConsoleColor.Black, 0).Render();
+                }
+                else
+                {
+                    new LineRenderInfo("   ", TextAligment.None, background: ConsoleColor.Black).Render();
+                }
 
                 if (Vertical)
                     row++;

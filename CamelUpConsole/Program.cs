@@ -4,7 +4,11 @@ using CamelUpConsole.Core.Pages.ReadyPages;
 using CamelUpConsole.Enums;
 using CamelUpConsole.Mappings;
 using CamelUpEngine;
+using CamelUpEngine.Core.Actions;
+using CamelUpEngine.Core.Actions.Events;
+using CamelUpEngine.Core.Enums;
 using CamelUpEngine.Extensions;
+using CamelUpEngine.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -294,17 +298,28 @@ namespace CamelUpConsole
             game = new Game(players);
             return;
         }
-
-        // TODO: Gameplay for Single and Multi
+        
         private static void Gameplay()
         {
             GameBoard gameBoard = new(game);
             renderPage = renderMenu = true;
+            bool renderHistory = false;
             while (true)
             {
+                while (!string.IsNullOrEmpty(singlePlayerName) && singlePlayerName != game.CurrentPlayer.Name && !game.TurnIsOver && !game.GameIsOver)
+                {
+                    GetAvailableActions().GetRandom()();
+                    gameBoard.History.Reset();
+                }
+
                 if (renderPage)
                 {
                     gameBoard.Render();
+                }
+                else if (renderHistory)
+                {
+                    gameBoard.History.Render();
+                    MenuBar.SetCursorInOptionSelect();
                 }
 
                 if (renderMenu)
@@ -315,6 +330,7 @@ namespace CamelUpConsole
 
                 renderPage = true;
                 renderMenu = true;
+                renderHistory = false;
                 switch ((keyInfo = Console.ReadKey(true)).Key)
                 {
                     case ConsoleKey.D:
@@ -373,18 +389,28 @@ namespace CamelUpConsole
                         break;
                     case ConsoleKey.UpArrow:
                         gameBoard.History.ScrollUp();
+                        renderPage = renderMenu = false;
+                        renderHistory = true;
                         break;
                     case ConsoleKey.DownArrow:
                         gameBoard.History.ScrollDown();
+                        renderPage = renderMenu = false;
+                        renderHistory = true;
                         break;
                     case ConsoleKey.PageUp:
                         gameBoard.History.PageUp();
+                        renderPage = renderMenu = false;
+                        renderHistory = true;
                         break;
                     case ConsoleKey.PageDown:
                         gameBoard.History.PageDown();
+                        renderPage = renderMenu = false;
+                        renderHistory = true;
                         break;
                     case ConsoleKey.Spacebar:
                         gameBoard.History.Reset();
+                        renderPage = renderMenu = false;
+                        renderHistory = true;
                         break;
                     case MenuMapping.BackKey:
                         if (Confirm("Are you sure that you want to leave current game"))
@@ -482,5 +508,26 @@ namespace CamelUpConsole
                 }
             }
         }
+
+        private static IReadOnlyCollection<Func<ActionEvents>> GetAvailableActions()
+        {
+            List<Func<ActionEvents>> availableActions = new() { AutoDrawDice };
+
+            if (game.AvailableTypingCards.Any())
+                availableActions.Add(AutoDrawTypingCard);
+
+            if (game.AudienceTileAvailableFields.Any())
+                availableActions.Add(AutoPlaceAudienceTile);
+
+            if (game.AvailableBetCards.Any())
+                availableActions.Add(AutoMakeBet);
+
+            return availableActions;
+        }
+
+        private static ActionEvents AutoDrawDice() => game.DrawDice();
+        private static ActionEvents AutoDrawTypingCard() => game.DrawTypingCard(game.AvailableTypingCards.GetRandom());
+        private static ActionEvents AutoPlaceAudienceTile() => game.PlaceAudienceTile(game.AudienceTileAvailableFields.GetRandom(), Enum.GetValues<AudienceTileSide>().GetRandom());
+        private static ActionEvents AutoMakeBet() => game.MakeBet(game.AvailableBetCards.GetRandom(), Enum.GetValues<BetType>().GetRandom());
     }
 }

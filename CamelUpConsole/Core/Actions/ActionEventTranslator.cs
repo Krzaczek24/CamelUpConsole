@@ -146,7 +146,7 @@ namespace CamelUpConsole.Core.Actions
             else if (e.SwitchReason == MadCamelColourSwitchReason.OtherMadCamelIsDirectlyOnBackOfOtherOne)
                 reason = "there was other mad camel directly on first ones back";
 
-            return new ActionEventDescription($"{fromColor} camel has benn switched to {toColor} camel because {reason}", ConsoleColor.Green);
+            return new ActionEventDescription($"{fromColor} camel has benn switched to {toColor} camel because\n{reason}", ConsoleColor.Green);
         }
 
         private static ActionEventDescription TypingCardDrawn(IActionEvent @event)

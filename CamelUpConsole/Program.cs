@@ -10,6 +10,7 @@ using CamelUpEngine.Core.Actions;
 using CamelUpEngine.Core.Actions.Events;
 using CamelUpEngine.Core.Enums;
 using CamelUpEngine.Extensions;
+using CamelUpEngine.GameObjects;
 using CamelUpEngine.GameObjects.Available;
 using CamelUpEngine.Helpers;
 using System;
@@ -501,12 +502,270 @@ namespace CamelUpConsole
 
         private static void PlaceAudienceTile(GameBoard gameBoard)
         {
-            game.PlaceAudienceTile(game.AudienceTileAvailableFields.GetRandom(), CamelUpEngine.Core.Enums.AudienceTileSide.Cheering);
+            renderMenu = true;
+            bool renderHistory = false;
+            while (true)
+            {
+                if (renderHistory)
+                {
+                    gameBoard.History.Render();
+                    MenuBar.SetCursorInOptionSelect();
+                }
+
+                if (renderMenu)
+                {
+                    DynamicOption option = new(string.Empty, MenuBar.GetProgressFunction(gameBoard.History));
+                    MenuBar.Render(MenuMapping.GetAvailableAudienceFieldsOptions(game, option), MenuLevels.GameActionChoose);
+                    MenuBar.PrintMessage("Please, choose field on which you want to place audience tile");
+                }
+
+                renderMenu = true;
+                renderHistory = false;
+                switch ((keyInfo = Console.ReadKey(true)).Key)
+                {
+                    //case ConsoleKey.R:
+                    //case ConsoleKey.Y:
+                    //case ConsoleKey.G:
+                    //case ConsoleKey.B:
+                    //case ConsoleKey.V:
+                    //    IAvailableBetCard card = game.AvailableBetCards.SingleOrDefault(card => card.Colour.ToString().First() == char.ToUpper(keyInfo.KeyChar));
+                    //    if (card == null)
+                    //    {
+                    //        MenuBar.PrintNoSupportedKeyError(keyInfo);
+                    //        renderMenu = false;
+                    //        break;
+                    //    }
+                    //    ChooseAudienceTileSide(gameBoard);
+                    //    return;
+                    case ConsoleKey.UpArrow:
+                        gameBoard.History.ScrollUp();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.DownArrow:
+                        gameBoard.History.ScrollDown();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.PageUp:
+                        gameBoard.History.PageUp();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.PageDown:
+                        gameBoard.History.PageDown();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.Spacebar:
+                        gameBoard.History.Reset();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case MenuMapping.BackKey:
+                        return;
+                    case MenuMapping.QuitKey:
+                        if (Confirm("Are you sure that you want to exit game?"))
+                            Environment.Exit(0);
+                        break;
+                    default:
+                        MenuBar.PrintNoSupportedKeyError(keyInfo);
+                        renderMenu = false;
+                        break;
+                }
+            }
+        }
+        
+        private static void ChooseAudienceTileSide(GameBoard gameBoard, IAvailableField availableField)
+        {
+            renderMenu = true;
+            bool renderHistory = false;
+            while (true)
+            {
+                if (renderHistory)
+                {
+                    gameBoard.History.Render();
+                    MenuBar.SetCursorInOptionSelect();
+                }
+
+                if (renderMenu)
+                {
+                    DynamicOption option = new(string.Empty, MenuBar.GetProgressFunction(gameBoard.History));
+                    MenuBar.Render(MenuMapping.GetAudienceSidesOptions(option), MenuLevels.GameActionChoose);
+                    MenuBar.PrintMessage("Please, choose audience tile side");
+                }
+
+                renderMenu = true;
+                renderHistory = false;
+                switch ((keyInfo = Console.ReadKey(true)).Key)
+                {
+                    case ConsoleKey.C:
+                        game.PlaceAudienceTile(availableField, AudienceTileSide.Cheering);
+                        return;
+                    case ConsoleKey.B:
+                        game.PlaceAudienceTile(availableField, AudienceTileSide.Booing);
+                        return;
+                    case ConsoleKey.UpArrow:
+                        gameBoard.History.ScrollUp();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.DownArrow:
+                        gameBoard.History.ScrollDown();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.PageUp:
+                        gameBoard.History.PageUp();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.PageDown:
+                        gameBoard.History.PageDown();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.Spacebar:
+                        gameBoard.History.Reset();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case MenuMapping.BackKey:
+                        return;
+                    case MenuMapping.QuitKey:
+                        if (Confirm("Are you sure that you want to exit game?"))
+                            Environment.Exit(0);
+                        break;
+                    default:
+                        MenuBar.PrintNoSupportedKeyError(keyInfo);
+                        renderMenu = false;
+                        break;
+                }
+            }
         }
 
         private static void MakeBet(GameBoard gameBoard)
         {
-            game.MakeBet(game.AvailableBetCards.GetRandom(), CamelUpEngine.Core.Enums.BetType.Winner);
+            renderMenu = true;
+            bool renderHistory = false;
+            while (true)
+            {
+                if (renderHistory)
+                {
+                    gameBoard.History.Render();
+                    MenuBar.SetCursorInOptionSelect();
+                }
+
+                if (renderMenu)
+                {
+                    DynamicOption option = new(string.Empty, MenuBar.GetProgressFunction(gameBoard.History));
+                    MenuBar.Render(MenuMapping.GetAvailableBetsOptions(game, option), MenuLevels.GameActionChoose);
+                    MenuBar.PrintMessage("Please, choose camel color that you are willing to bet");
+                }
+
+                renderMenu = true;
+                renderHistory = false;
+                switch ((keyInfo = Console.ReadKey(true)).Key)
+                {
+                    case ConsoleKey.R:
+                    case ConsoleKey.Y:
+                    case ConsoleKey.G:
+                    case ConsoleKey.B:
+                    case ConsoleKey.V:
+                        IAvailableBetCard card = game.AvailableBetCards.SingleOrDefault(card => card.Colour.ToString().First() == char.ToUpper(keyInfo.KeyChar));
+                        if (card == null)
+                        {
+                            MenuBar.PrintNoSupportedKeyError(keyInfo);
+                            renderMenu = false;
+                            break;
+                        }
+                        ChooseBetType(gameBoard, card);
+                        return;
+                    case ConsoleKey.UpArrow:
+                        gameBoard.History.ScrollUp();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.DownArrow:
+                        gameBoard.History.ScrollDown();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.PageUp:
+                        gameBoard.History.PageUp();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.PageDown:
+                        gameBoard.History.PageDown();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.Spacebar:
+                        gameBoard.History.Reset();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case MenuMapping.BackKey:
+                        return;
+                    case MenuMapping.QuitKey:
+                        if (Confirm("Are you sure that you want to exit game?"))
+                            Environment.Exit(0);
+                        break;
+                    default:
+                        MenuBar.PrintNoSupportedKeyError(keyInfo);
+                        renderMenu = false;
+                        break;
+                }
+            }
+        }
+
+        private static void ChooseBetType(GameBoard gameBoard, IAvailableBetCard betCard)
+        {
+            renderMenu = true;
+            bool renderHistory = false;
+            while (true)
+            {
+                if (renderHistory)
+                {
+                    gameBoard.History.Render();
+                    MenuBar.SetCursorInOptionSelect();
+                }
+
+                if (renderMenu)
+                {
+                    DynamicOption option = new(string.Empty, MenuBar.GetProgressFunction(gameBoard.History));
+                    MenuBar.Render(MenuMapping.GetBetsTypesOptions(option), MenuLevels.GameActionChoose);
+                    MenuBar.PrintMessage("Please, choose bet type");
+                }
+
+                renderMenu = true;
+                renderHistory = false;
+                switch ((keyInfo = Console.ReadKey(true)).Key)
+                {
+                    case ConsoleKey.W:
+                        game.MakeBet(betCard, BetType.Winner);
+                        return;
+                    case ConsoleKey.L:
+                        game.MakeBet(betCard, BetType.Loser);
+                        return;
+                    case ConsoleKey.UpArrow:
+                        gameBoard.History.ScrollUp();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.DownArrow:
+                        gameBoard.History.ScrollDown();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.PageUp:
+                        gameBoard.History.PageUp();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.PageDown:
+                        gameBoard.History.PageDown();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.Spacebar:
+                        gameBoard.History.Reset();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case MenuMapping.BackKey:
+                        return;
+                    case MenuMapping.QuitKey:
+                        if (Confirm("Are you sure that you want to exit game?"))
+                            Environment.Exit(0);
+                        break;
+                    default:
+                        MenuBar.PrintNoSupportedKeyError(keyInfo);
+                        renderMenu = false;
+                        break;
+                }
+            }
         }
 
         private static bool Confirm(string message, ConsoleColor color = ConsoleColor.DarkYellow)

@@ -62,6 +62,44 @@ namespace CamelUpConsole.Mappings
             return options;
         }
 
+        public static Options GetAvailableAudienceFieldsOptions(Game game, DynamicOption historyProgress = null)
+        {
+            Options options = new(ScrollHistory, GoBack, ExitApp);
+            if (historyProgress != null)
+                options = options.Insert(1, historyProgress);
+            //IList<IAvailableBetCard> availableBetCards = game.AvailableBetCards.Reverse().ToList();
+            //foreach (IAvailableBetCard betCard in availableBetCards)
+            //    options = options.Insert(0, new Option($"{betCard.Colour.ToString().First()} {betCard.Colour} "));
+            return options;
+        }
+
+        public static Options GetAudienceSidesOptions(DynamicOption historyProgress = null)
+        {
+            Options options = new("C Cheering ", "B Booing ", ScrollHistory, GoBack, ExitApp);
+            if (historyProgress != null)
+                options = options.Insert(3, historyProgress);
+            return options;
+        }
+
+        public static Options GetAvailableBetsOptions(Game game, DynamicOption historyProgress = null)
+        {
+            Options options = new(ScrollHistory, GoBack, ExitApp);
+            if (historyProgress != null)
+                options = options.Insert(1, historyProgress);
+            IList<IAvailableBetCard> availableBetCards = game.AvailableBetCards.Reverse().ToList();
+            foreach (IAvailableBetCard betCard in availableBetCards)
+                options = options.Insert(0, new Option($"{betCard.Colour.ToString().First()} {betCard.Colour} "));
+            return options;
+        }
+
+        public static Options GetBetsTypesOptions(DynamicOption historyProgress = null)
+        {
+            Options options = new("W Winner ", "L Loser ", ScrollHistory, GoBack, ExitApp);
+            if (historyProgress != null)
+                options = options.Insert(3, historyProgress);
+            return options;
+        }
+
         public static IReadOnlyDictionary<MenuLevels, Options> LevelOptions { get; } = new Dictionary<MenuLevels, Options>()
         {
             [MenuLevels.BackOrQuit] = new Options(GoBack, ExitApp),

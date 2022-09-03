@@ -1,9 +1,7 @@
 ﻿using CamelUpConsole.Core.MenuBar.Models;
 using CamelUpConsole.Core.Pages;
-using CamelUpConsole.Core.Pages.ReadyPages;
 using CamelUpConsole.Enums;
 using CamelUpConsole.Mappings;
-using CamelUpEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,18 +16,6 @@ namespace CamelUpConsole.Core.MenuBar
         public static void Render(MenuLevels menuLevel)
         {
             Render(MenuMapping.LevelOptions[menuLevel], MenuMapping.LevelOptionsAlignToRight[menuLevel]);
-        }
-
-        public static void Render(ScrollablePage scrollablePage, ScrollableProgressType progressType = ScrollableProgressType.Position)
-        {
-            DynamicOption option = new("Line", GetProgressFunction(scrollablePage, progressType));
-            Render(MenuMapping.LevelOptions[MenuLevels.Scrollable].Insert(4, option), MenuMapping.LevelOptionsAlignToRight[MenuLevels.Scrollable]);
-        }
-
-        public static void Render(Game game, GameBoard gameBoardPage, ScrollableProgressType progressType = ScrollableProgressType.Position)
-        {
-            DynamicOption option = new(string.Empty, GetProgressFunction(gameBoardPage.History, progressType));
-            Render(MenuMapping.GetGameOptions(game, option), MenuMapping.LevelOptionsAlignToRight[MenuLevels.GameActionChoose]);
         }
 
         public static void Render(Options options, MenuLevels menuLevel) => Render(options, MenuMapping.LevelOptionsAlignToRight[menuLevel]);
@@ -48,7 +34,7 @@ namespace CamelUpConsole.Core.MenuBar
                 keyString = keyInfo.Key.ToString();
             else
                 keyString = keyInfo.KeyChar.ToString().ToUpper();
-            PrintError($"There is no action available for [{keyString}] key");
+            PrintError($"There is no available action for [{keyString}] key");
         }
         public static void PrintError(string message) => PrintMessage(message, ConsoleColor.DarkRed);
         public static void PrintWarning(string message) => PrintMessage(message, ConsoleColor.DarkYellow);
@@ -148,7 +134,7 @@ namespace CamelUpConsole.Core.MenuBar
             return option.Key.Length + description.Length;
         }
 
-        private static Func<string> GetProgressFunction(IScrollable scrollable, ScrollableProgressType progressType)
+        public static Func<string> GetProgressFunction(IScrollable scrollable, ScrollableProgressType progressType = ScrollableProgressType.Position)
         {
             switch (progressType)
             {

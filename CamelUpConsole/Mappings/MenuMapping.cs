@@ -1,6 +1,7 @@
 ﻿using CamelUpConsole.Core.MenuBar.Models;
 using CamelUpConsole.Enums;
 using CamelUpEngine;
+using CamelUpEngine.GameObjects.Available;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,9 @@ namespace CamelUpConsole.Mappings
         public const ConsoleKey BackKey = ConsoleKey.Escape;
         public const ConsoleKey QuitKey = ConsoleKey.F4;
 
+        private static Option ScrollHistory = new Option("↑↓", " Scroll history ");
         private static Option GoBack => new Option(BackKey.ToString().Substring(0, 3), " Go back ");
+        private static Option LeaveGame => new Option(BackKey.ToString().Substring(0, 3), " Leave game ");
         private static Option ExitApp => new Option(QuitKey.ToString(), " Quit app ");
 
         public static Options GetGameOptions(Game game, DynamicOption historyProgress = null)
@@ -22,7 +25,7 @@ namespace CamelUpConsole.Mappings
 
             if (game.GameIsOver)
             {
-                options = new(new Option("↑↓", " Scroll history "), GoBack, ExitApp);
+                options = new(ScrollHistory, GoBack, ExitApp);
                 if (historyProgress != null)
                     options = options.Insert(1, historyProgress);
                 return options;
@@ -30,13 +33,13 @@ namespace CamelUpConsole.Mappings
 
             if (game.TurnIsOver)
             {
-                options = new("N Go to next turn ", new Option("↑↓", " Scroll history "), GoBack, ExitApp);
+                options = new("N Go to next turn ", ScrollHistory, GoBack, ExitApp);
                 if (historyProgress != null)
                     options = options.Insert(2, historyProgress);
                 return options;
             }
 
-            options = new("D Draw dice ", new Option("↑↓", " Scroll history "), new Option(BackKey.ToString().Substring(0, 3), " Leave game "), ExitApp);
+            options = new("D Draw dice ", ScrollHistory, LeaveGame, ExitApp);
             if (historyProgress != null)
                 options = options.Insert(2, historyProgress);
             if (game.AvailableBetCards.Any())
@@ -45,6 +48,17 @@ namespace CamelUpConsole.Mappings
                 options = options.Insert(1, new("A Put audience tile "));
             if (game.AvailableTypingCards.Any())
                 options = options.Insert(1, new("C Draw card "));
+            return options;
+        }
+
+        public static Options GetAvailableTypingCardOptions(Game game, DynamicOption historyProgress = null)
+        {
+            Options options = new(ScrollHistory, GoBack, ExitApp);
+            if (historyProgress != null)
+                options = options.Insert(1, historyProgress);
+            IList<IAvailableTypingCard> availableCards = game.AvailableTypingCards.Reverse().ToList();
+            foreach (IAvailableTypingCard card in availableCards)
+                options = options.Insert(0, new Option($"{card.Colour.ToString().First()} {card.Colour} ({(int)card.Value}) "));
             return options;
         }
 
@@ -67,7 +81,7 @@ namespace CamelUpConsole.Mappings
             [MenuLevels.BackOrQuit] = -1,
             [MenuLevels.ComputerPlayersCount] = 2,
             [MenuLevels.Confirmation] = 0,
-            [MenuLevels.GameActionChoose] = 2,
+            [MenuLevels.GameActionChoose] = 4,
             [MenuLevels.GameMode] = 2,
             [MenuLevels.HumanPlayersCount] = 2,
             [MenuLevels.MainMenu] = 2,

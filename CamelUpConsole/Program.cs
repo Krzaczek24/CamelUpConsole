@@ -10,10 +10,12 @@ using CamelUpEngine.Core.Actions;
 using CamelUpEngine.Core.Actions.Events;
 using CamelUpEngine.Core.Enums;
 using CamelUpEngine.Extensions;
+using CamelUpEngine.GameObjects.Available;
 using CamelUpEngine.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace CamelUpConsole
 {
@@ -325,8 +327,9 @@ namespace CamelUpConsole
 
                 if (renderMenu)
                 {
-                    MenuBar.Render(game, gameBoard);
-                    MenuBar.PrintMessage("Work in progress");
+                    DynamicOption option = new(string.Empty, MenuBar.GetProgressFunction(gameBoard.History));
+                    MenuBar.Render(MenuMapping.GetGameOptions(game, option), MenuLevels.GameActionChoose);
+                    MenuBar.PrintMessage("Please, choose one from available actions");
                 }
 
                 renderPage = true;
@@ -341,7 +344,6 @@ namespace CamelUpConsole
                             renderPage = renderMenu = false;
                             break;
                         }
-                        // TODO: DRAW DICE
                         game.DrawDice();
                         gameBoard.History.Reset();
                         break;
@@ -352,8 +354,7 @@ namespace CamelUpConsole
                             renderPage = renderMenu = false;
                             break;
                         }
-                        // TODO: DRAW TYPING CARD
-                        game.DrawTypingCard(game.AvailableTypingCards.GetRandom());
+                        DrawCard(gameBoard);
                         gameBoard.History.Reset();
                         break;
                     case ConsoleKey.A:
@@ -363,8 +364,7 @@ namespace CamelUpConsole
                             renderPage = renderMenu = false;
                             break;
                         }
-                        // TODO: PUT AUDIENCE TILE
-                        game.PlaceAudienceTile(game.AudienceTileAvailableFields.GetRandom(), CamelUpEngine.Core.Enums.AudienceTileSide.Cheering);
+                        PlaceAudienceTile(gameBoard);
                         gameBoard.History.Reset();
                         break;
                     case ConsoleKey.B:
@@ -374,8 +374,7 @@ namespace CamelUpConsole
                             renderPage = renderMenu = false;
                             break;
                         }
-                        // TODO: MAKE BET
-                        game.MakeBet(game.AvailableBetCards.GetRandom(), CamelUpEngine.Core.Enums.BetType.Winner);
+                        MakeBet(gameBoard);
                         gameBoard.History.Reset();
                         break;
                     case ConsoleKey.N:
@@ -429,6 +428,87 @@ namespace CamelUpConsole
             }
         }
 
+        private static void DrawCard(GameBoard gameBoard)
+        {
+            renderMenu = true;
+            bool renderHistory = false;
+            while (true)
+            {
+                if (renderHistory)
+                {
+                    gameBoard.History.Render();
+                    MenuBar.SetCursorInOptionSelect();
+                }
+
+                if (renderMenu)
+                {
+                    DynamicOption option = new(string.Empty, MenuBar.GetProgressFunction(gameBoard.History));
+                    MenuBar.Render(MenuMapping.GetAvailableTypingCardOptions(game, option), MenuLevels.GameActionChoose);
+                    MenuBar.PrintMessage("Please, choose typing card that you are willing to draw");
+                }
+
+                renderMenu = true;
+                renderHistory = false;
+                switch ((keyInfo = Console.ReadKey(true)).Key)
+                {
+                    case ConsoleKey.R:
+                    case ConsoleKey.Y:
+                    case ConsoleKey.G:
+                    case ConsoleKey.B:
+                    case ConsoleKey.V:
+                        IAvailableTypingCard card = game.AvailableTypingCards.SingleOrDefault(card => card.Colour.ToString().First() == char.ToUpper(keyInfo.KeyChar));
+                        if (card == null)
+                        {
+                            MenuBar.PrintNoSupportedKeyError(keyInfo);
+                            renderMenu = false;
+                            break;
+                        }
+                        game.DrawTypingCard(card);
+                        return;
+                    case ConsoleKey.UpArrow:
+                        gameBoard.History.ScrollUp();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.DownArrow:
+                        gameBoard.History.ScrollDown();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.PageUp:
+                        gameBoard.History.PageUp();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.PageDown:
+                        gameBoard.History.PageDown();
+                        renderMenu = renderHistory = true;
+                        break;
+                    case ConsoleKey.Spacebar:
+                        gameBoard.History.Reset();                        
+                        renderMenu = renderHistory = true;
+                        break;
+                    case MenuMapping.BackKey:
+                        return;
+                    case MenuMapping.QuitKey:
+                        if (Confirm("Are you sure that you want to exit game?"))
+                            Environment.Exit(0);
+                        break;
+                    default:
+                        MenuBar.PrintNoSupportedKeyError(keyInfo);
+                        renderMenu = false;
+                        break;
+                }
+            }
+        }
+
+        private static void PlaceAudienceTile(GameBoard gameBoard)
+        {
+            game.PlaceAudienceTile(game.AudienceTileAvailableFields.GetRandom(), CamelUpEngine.Core.Enums.AudienceTileSide.Cheering);
+        }
+
+        private static void MakeBet(GameBoard gameBoard)
+        {
+            game.MakeBet(game.AvailableBetCards.GetRandom(), CamelUpEngine.Core.Enums.BetType.Winner);
+        }
+
         private static bool Confirm(string message, ConsoleColor color = ConsoleColor.DarkYellow)
         {
             string oldSelectionText = MenuBar.Settings.SelectionText;
@@ -475,7 +555,8 @@ namespace CamelUpConsole
 
                 if (renderMenu)
                 {
-                    MenuBar.Render(aboutGame);
+                    DynamicOption option = new("Line", MenuBar.GetProgressFunction(aboutGame));
+                    MenuBar.Render(MenuMapping.LevelOptions[MenuLevels.Scrollable].Insert(4, option), MenuMapping.LevelOptionsAlignToRight[MenuLevels.Scrollable]);
                     MenuBar.PrintMessage("My dear friend, I am so pleased for that you came here to check this information.");
                 }
 
@@ -527,7 +608,31 @@ namespace CamelUpConsole
         }
 
         private static ActionEvents AutoDrawDice() => game.DrawDice();
-        private static ActionEvents AutoDrawTypingCard() => game.DrawTypingCard(game.AvailableTypingCards.GetRandom());
+        private static ActionEvents AutoDrawTypingCard()
+        {
+            IList<Colour> orderedCamelColours = game.Camels.Where(camel => !camel.IsMad).GetColours().ToList();
+            IList<Colour> availableCardColours = game.AvailableTypingCards.GetColours().ToList();
+            orderedCamelColours = orderedCamelColours.Intersect(availableCardColours).ToList();
+            Colour selectedColour;
+
+            if (Random.Shared.Next(3) == 0) // 33% for getting card for first camel available typing card
+                selectedColour = orderedCamelColours.First();
+            else
+            {
+                IList<Colour> colorsToSelect = new List<Colour>();
+                int max = 1;
+                int absoluteMax = (int)Math.Ceiling(orderedCamelColours.Count * 0.75);
+                for (int index = orderedCamelColours.Count - 1; index >= 0; index--)
+                {
+                    for (int i = 1; i <= max; i++)
+                        colorsToSelect.Add(orderedCamelColours[index]);
+                    max = Math.Min(++max, absoluteMax);
+                }
+                selectedColour = colorsToSelect.GetRandom();
+            }
+
+            return game.DrawTypingCard(game.AvailableTypingCards.Single(card => card.Colour == selectedColour));
+        }
         private static ActionEvents AutoPlaceAudienceTile() => game.PlaceAudienceTile(game.AudienceTileAvailableFields.GetRandom(), Enum.GetValues<AudienceTileSide>().GetRandom());
         private static ActionEvents AutoMakeBet() => game.MakeBet(game.AvailableBetCards.GetRandom(), Enum.GetValues<BetType>().GetRandom());
     }

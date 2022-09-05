@@ -40,7 +40,7 @@ namespace CamelUpConsole.Core.Pages.ReadySections
                 }
                 else
                 {
-                    new LineRenderInfo("   ", TextAligment.None, background: ConsoleColor.Black).Render();
+                    new LineRenderInfo(string.Empty.PadRight(5), TextAligment.None, background: ConsoleColor.Black).Render();
                 }
 
                 if (Vertical)

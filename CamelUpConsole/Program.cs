@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 
 namespace CamelUpConsole
 {
@@ -508,6 +509,7 @@ namespace CamelUpConsole
 
         private static void PlaceAudienceTile(GameBoard gameBoard)
         {
+            string fieldIndex = string.Empty;
             renderMenu = true;
             bool renderHistory = false;
             while (true)
@@ -520,29 +522,62 @@ namespace CamelUpConsole
 
                 if (renderMenu)
                 {
+                    MenuBar.Settings.SelectionText = $"Enter selected field index: {fieldIndex}";
                     DynamicOption option = new(string.Empty, MenuBar.GetProgressFunction(gameBoard.History));
-                    MenuBar.Render(MenuMapping.GetAvailableAudienceFieldsOptions(game, option), MenuLevels.GameActionChoose);
-                    MenuBar.PrintMessage("Please, choose field on which you want to place audience tile");
+                    MenuBar.Render(MenuMapping.GetAvailableAudienceFieldsOptions(option), MenuLevels.GameActionChoose);
+                    MenuBar.PrintMessage($"Please, type field index to place audience tile ({string.Join(", ", game.AudienceTileAvailableFields.Select(field => field.Index))})");
                 }
 
                 renderMenu = true;
                 renderHistory = false;
                 switch ((keyInfo = Console.ReadKey(true)).Key)
                 {
-                    //case ConsoleKey.R:
-                    //case ConsoleKey.Y:
-                    //case ConsoleKey.G:
-                    //case ConsoleKey.B:
-                    //case ConsoleKey.V:
-                    //    IAvailableBetCard card = game.AvailableBetCards.SingleOrDefault(card => card.Colour.ToString().First() == char.ToUpper(keyInfo.KeyChar));
-                    //    if (card == null)
-                    //    {
-                    //        MenuBar.PrintNoSupportedKeyError(keyInfo);
-                    //        renderMenu = false;
-                    //        break;
-                    //    }
-                    //    ChooseAudienceTileSide(gameBoard);
-                    //    return;
+                    case ConsoleKey.Enter:
+                        IAvailableField field = null;
+                        if (!int.TryParse(fieldIndex, out int index))
+                        {
+                            MenuBar.PrintError($"Please type one of following field indexes ({string.Join(", ", game.AudienceTileAvailableFields.Select(field => field.Index))})");
+                            renderMenu = false;
+                            break;
+                        }
+                        field = game.AudienceTileAvailableFields.SingleOrDefault(field => field.Index == index);
+                        if (field == null)
+                        {
+                            MenuBar.PrintError($"There is no available field with index {fieldIndex}, please type one of these ({string.Join(", ", game.AudienceTileAvailableFields.Select(field => field.Index))})");
+                            renderMenu = false;
+                            break;
+                        }
+                        MenuBar.Settings.ResetSelectionText();
+                        ChooseAudienceTileSide(gameBoard, field);
+                        return;
+                    case ConsoleKey.LeftArrow:
+                    case ConsoleKey.OemMinus:
+                        if (!int.TryParse(fieldIndex, out index))
+                        {
+                            fieldIndex = game.AudienceTileAvailableFields.Last().Index.ToString();
+                            break;
+                        }
+                        do
+                            index = (--index + game.Fields.Count() - 1) % game.Fields.Count() + 1;
+                        while (!game.AudienceTileAvailableFields.Select(field => field.Index).Contains(index));
+                        fieldIndex = index.ToString();
+                        break;
+                    case ConsoleKey.RightArrow:
+                    case ConsoleKey.OemPlus:
+                        if (!int.TryParse(fieldIndex, out index))
+                        {
+                            fieldIndex = game.AudienceTileAvailableFields.First().Index.ToString();
+                            break;
+                        }
+                        do
+                            index = (++index + game.Fields.Count() - 1) % game.Fields.Count() + 1;
+                        while (!game.AudienceTileAvailableFields.Select(field => field.Index).Contains(index));
+                        fieldIndex = index.ToString();
+                        break;
+                    case ConsoleKey.Backspace:
+                        if (fieldIndex.Length > 0)
+                            fieldIndex = new string(fieldIndex.SkipLast(1).ToArray());
+                        break;
                     case ConsoleKey.UpArrow:
                         gameBoard.History.ScrollUp();
                         renderMenu = renderHistory = true;
@@ -564,14 +599,26 @@ namespace CamelUpConsole
                         renderMenu = renderHistory = true;
                         break;
                     case MenuMapping.BackKey:
+                        MenuBar.Settings.ResetSelectionText();
                         return;
                     case MenuMapping.QuitKey:
                         if (Confirm("Are you sure that you want to exit game?"))
                             Environment.Exit(0);
                         break;
                     default:
-                        MenuBar.PrintNoSupportedKeyError(keyInfo);
-                        renderMenu = false;
+                        if (!char.IsDigit(keyInfo.KeyChar))
+                        {
+                            MenuBar.PrintError("I am sorry, for field index please use only digits.");
+                            renderMenu = false;
+                            break;
+                        }
+                        if (fieldIndex.Length >= game.Fields.Count.ToString().Length)
+                        {
+                            MenuBar.PrintError($"I am so sorry, but field index cannot be longer than {game.Fields.Count.ToString().Length} digits.");
+                            renderMenu = false;
+                            break;
+                        }
+                        fieldIndex += keyInfo.KeyChar;
                         break;
                 }
             }
@@ -593,7 +640,7 @@ namespace CamelUpConsole
                 {
                     DynamicOption option = new(string.Empty, MenuBar.GetProgressFunction(gameBoard.History));
                     MenuBar.Render(MenuMapping.GetAudienceSidesOptions(option), MenuLevels.GameActionChoose);
-                    MenuBar.PrintMessage("Please, choose audience tile side");
+                    MenuBar.PrintMessage($"Please, choose audience tile side that you want to place on {availableField.Index}. field.");
                 }
 
                 renderMenu = true;

@@ -62,14 +62,11 @@ namespace CamelUpConsole.Mappings
             return options;
         }
 
-        public static Options GetAvailableAudienceFieldsOptions(Game game, DynamicOption historyProgress = null)
+        public static Options GetAvailableAudienceFieldsOptions(DynamicOption historyProgress = null)
         {
-            Options options = new(ScrollHistory, GoBack, ExitApp);
+            Options options = new(new Option("Enter", " Confirm "), new Option("+|►", " Increase "), new Option("-|◄", " Decrease "), ScrollHistory, GoBack, ExitApp);
             if (historyProgress != null)
-                options = options.Insert(1, historyProgress);
-            //IList<IAvailableBetCard> availableBetCards = game.AvailableBetCards.Reverse().ToList();
-            //foreach (IAvailableBetCard betCard in availableBetCards)
-            //    options = options.Insert(0, new Option($"{betCard.Colour.ToString().First()} {betCard.Colour} "));
+                options = options.Insert(4, historyProgress);
             return options;
         }
 

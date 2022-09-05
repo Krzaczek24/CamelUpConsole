@@ -33,7 +33,7 @@ namespace CamelUpConsole.Core.Pages.ReadySections
 
                 Console.SetCursorPosition(col, bottomRow - 2);
                 new LineRenderInfo("[", TextAligment.None, ConsoleColor.DarkMagenta, ConsoleColor.Black).Render();
-                new LineRenderInfo(GetAudienceTileChar(field), TextAligment.None, ConsoleColor.Green, ConsoleColor.Black).Render();
+                RenderAudienceTileChar(field);
                 new LineRenderInfo("]", TextAligment.None, ConsoleColor.DarkMagenta, ConsoleColor.Black).Render();
 
                 var camels = field.Camels.ToArray();
@@ -54,17 +54,25 @@ namespace CamelUpConsole.Core.Pages.ReadySections
             }         
         }
 
-        private string GetAudienceTileChar(IField field)
+        private void RenderAudienceTileChar(IField field)
         {
             char audienceTile = ' ';
+            ConsoleColor tileColor = ConsoleColor.Black;
             if (field.AudienceTile != null)
             {
                 if (field.AudienceTile.Side == AudienceTileSide.Cheering)
+                {
                     audienceTile = '+';
+                    tileColor = ConsoleColor.Green;
+                }   
                 else
+                {
                     audienceTile = '-';
+                    tileColor = ConsoleColor.Red;
+                }
             }
-            return audienceTile.ToString();
+
+            new LineRenderInfo($"{audienceTile}", TextAligment.None, tileColor, ConsoleColor.Black).Render();
         }
     }
 }

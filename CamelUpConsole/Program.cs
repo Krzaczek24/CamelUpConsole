@@ -246,6 +246,12 @@ namespace CamelUpConsole
                         case ConsoleKey.Enter:
                             if (Game.IsPlayerNameValid(playerName))
                             {
+                                if (players.Select(p => p.ToUpper()).Contains(playerName.ToUpper()))
+                                {
+                                    MenuBar.PrintError("I am sorry, but you already added such player name.");
+                                    renderMenu = false;
+                                    break;
+                                }
                                 players.Add(playerName);
                                 commitedPlayerName = true;
                             }

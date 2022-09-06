@@ -4,9 +4,7 @@ using CamelUpEngine;
 using CamelUpEngine.Core.Enums;
 using CamelUpEngine.GameObjects;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
 
 namespace CamelUpConsole.Core.Pages.ReadySections
 {

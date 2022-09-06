@@ -59,10 +59,10 @@ namespace CamelUpConsole.Core.Pages.ReadyPages
             new LineRenderInfo("|_|_\\\\___||_|\\___|\\__,_|/__/\\___| \\__,_|\\__,_| \\__|\\___|", Enums.TextAligment.Left, ConsoleColor.Green, margin: 1),
             new LineRenderInfo("                                                        ", Enums.TextAligment.Left, ConsoleColor.Green, margin: 1),
 
-            new LineRenderInfo(" _  ____       __   ___      ___  __  ___  ___ ", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
-            new LineRenderInfo("/ ||__ / ___  /  \\ ( _ ) ___|_  )/  \\|_  )|_  )", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
-            new LineRenderInfo("| | |_ \\|___|| () |/ _ \\|___|/ /| () |/ /  / / ", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
-            new LineRenderInfo("|_||___/      \\__/ \\___/    /___|\\__//___|/___|", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
+            new LineRenderInfo("  __    __        __   ___      ___  __  ___  ___ ", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
+            new LineRenderInfo(" /  \\  / /  ___  /  \\ / _ \\ ___|_  )/  \\|_  )|_  )", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
+            new LineRenderInfo("| () |/ _ \\|___|| () |\\_, /|___|/ /| () |/ /  / / ", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
+            new LineRenderInfo(" \\__/ \\___/      \\__/  /_/     /___|\\__//___|/___|", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
             new LineRenderInfo("                                               ", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
 
             new LineRenderInfo("__   __              _            ", Enums.TextAligment.Left, ConsoleColor.Green, margin: 1),
@@ -71,10 +71,10 @@ namespace CamelUpConsole.Core.Pages.ReadyPages
             new LineRenderInfo("  \\_/ \\___||_|  /__/|_|\\___/|_||_|", Enums.TextAligment.Left, ConsoleColor.Green, margin: 1),
             new LineRenderInfo("                                  ", Enums.TextAligment.Left, ConsoleColor.Green, margin: 1),
 
-            new LineRenderInfo("      _     __     __  ", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
-            new LineRenderInfo("__ __/ |   /  \\   /  \\ ", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
-            new LineRenderInfo("\\ V /| | _| () |_| () |", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
-            new LineRenderInfo(" \\_/ |_|(_)\\__/(_)\\__/ ", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
+            new LineRenderInfo("      _     __     _ ", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
+            new LineRenderInfo("__ __/ |   /  \\   / |", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
+            new LineRenderInfo("\\ V /| | _| () |_ | |", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
+            new LineRenderInfo(" \\_/ |_|(_)\\__/(_)|_|", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
             new LineRenderInfo("                       ", Enums.TextAligment.Right, ConsoleColor.Magenta, margin: 1),
 
             new LineRenderInfo("  ___  _  _    _  _        _                       __  _  _      ", Enums.TextAligment.Left, ConsoleColor.Green, margin: 1),

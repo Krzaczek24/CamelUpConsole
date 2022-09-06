@@ -1,12 +1,10 @@
 ﻿using CamelUpEngine.Core.Actions;
 using CamelUpEngine.Core.Actions.Events;
 using CamelUpEngine.Core.Enums;
-using CamelUpEngine.GameObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using static CamelUpConsole.Core.MenuBar.MenuBar.Settings.Colors;
 
 namespace CamelUpConsole.Core.Actions
 {
@@ -57,17 +55,19 @@ namespace CamelUpConsole.Core.Actions
         {
             var e = (IBetsSummaryEvent)@event;
             var descriptions = new List<ActionEventDescription>() { new ActionEventDescription("Bets summary:", ConsoleColor.Blue) };
+
             descriptions.Add(new ActionEventDescription("Winner bets:", ConsoleColor.DarkCyan));
             if (e.WinnerRewards.Any())
                 descriptions.AddRange(e.WinnerRewards.SelectMany(subEvent => CoinsAdded(subEvent)).ToList());
             else
                 descriptions.Add(new ActionEventDescription("No one make a bet", ConsoleColor.Cyan));
-            descriptions.AddRange(e.WinnerRewards.SelectMany(subEvent => CoinsAdded(subEvent)).ToList());
+
             descriptions.Add(new ActionEventDescription("Loser bets:", ConsoleColor.DarkCyan));
             if (e.LoserRewards.Any())
                 descriptions.AddRange(e.LoserRewards.SelectMany(subEvent => CoinsAdded(subEvent)).ToList());
             else
                 descriptions.Add(new ActionEventDescription("No one make a bet", ConsoleColor.Cyan));
+
             return descriptions;
         }
 
@@ -98,7 +98,7 @@ namespace CamelUpConsole.Core.Actions
 
             StringBuilder camels = new StringBuilder($"{e.Camels.Last().Colour} camel moved");
             if (e.Camels.Count > 1)
-                camels.Append($" with {e.Camels.Count} other camels");
+                camels.Append($" with {e.Camels.Count - 1} other {(e.Camels.Count > 2 ? "camels" : "camel")}");
             camels.Append($" from {e.FromFieldIndex}. field to {e.ToFieldIndex}. field");
 
             return new List<ActionEventDescription>() { new ActionEventDescription(camels.ToString()) };

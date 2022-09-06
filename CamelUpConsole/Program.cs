@@ -1,23 +1,18 @@
 ﻿using CamelUpConsole.Constants;
 using CamelUpConsole.Core.MenuBar;
 using CamelUpConsole.Core.MenuBar.Models;
-using CamelUpConsole.Core.Pages;
 using CamelUpConsole.Core.Pages.ReadyPages;
 using CamelUpConsole.Enums;
 using CamelUpConsole.Mappings;
 using CamelUpEngine;
 using CamelUpEngine.Core.Actions;
-using CamelUpEngine.Core.Actions.Events;
 using CamelUpEngine.Core.Enums;
 using CamelUpEngine.Extensions;
-using CamelUpEngine.GameObjects;
 using CamelUpEngine.GameObjects.Available;
 using CamelUpEngine.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Security.Cryptography;
 
 namespace CamelUpConsole
 {
